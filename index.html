@@ -387,6 +387,52 @@
             overflow: hidden;
         }
 
+        /* Zoom overlay */
+        .zoom-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            cursor: zoom-out;
+            padding: 20px;
+        }
+
+        .zoom-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .zoom-overlay img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.4));
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .zoom-overlay.open img {
+            transform: scale(1);
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 24px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.75rem;
+        }
+
+        .illustration {
+            cursor: zoom-in;
+        }
+
         @media (max-width: 380px) {
             body {
                 padding: 12px;
@@ -430,7 +476,7 @@
     </div>
 
     <div class="card" id="card" onclick="generate()">
-        <div class="illustration" id="illustration"></div>
+        <div class="illustration" id="illustration" onclick="openZoom(event)"></div>
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
@@ -440,6 +486,11 @@
     <div class="list-toggle" onclick="openList()">Voir toutes les positions</div>
 
     <footer>Have fun !</footer>
+
+    <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom()">
+        <img id="zoomImg" src="" alt=""/>
+        <span class="zoom-hint">Touche pour fermer</span>
+    </div>
 
     <div class="list-overlay" id="listOverlay" onclick="closeList()"></div>
     <div class="list-panel" id="listPanel">
@@ -1127,6 +1178,21 @@
             showPosition(pos, true);
         }
 
+        function openZoom(e) {
+            e.stopPropagation();
+            if (lastIndex < 0) return;
+            const pos = positions[lastIndex];
+            const src = pos.img ? IMG_BASE + pos.img : '';
+            if (!src) return;
+            document.getElementById('zoomImg').src = src;
+            document.getElementById('zoomImg').alt = pos.name;
+            document.getElementById('zoomOverlay').classList.add('open');
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomOverlay').classList.remove('open');
+        }
+
         function buildList() {
             const body = document.getElementById('listBody');
             const groups = { facile: [], moyen: [], avance: [] };
@@ -1184,6 +1250,7 @@
 
         // Raccourci clavier (Espace)
         document.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') return closeZoom();
             if (e.code === 'Space') {
                 e.preventDefault();
                 generate();
