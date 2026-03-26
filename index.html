@@ -70,37 +70,19 @@
             align-items: center;
             justify-content: center;
             border: 2px solid rgba(233, 69, 96, 0.3);
-            position: relative;
+            overflow: hidden;
         }
 
-        .illustration svg {
-            width: 75%;
-            height: 75%;
-        }
-
-        .illustration.detailed svg {
-            display: none;
-        }
-
-        .illustration img.real-img {
-            display: none;
+        .illustration img {
             width: 80%;
             height: 80%;
             object-fit: contain;
             filter: drop-shadow(0 0 8px rgba(233, 69, 96, 0.3));
         }
 
-        .illustration.detailed img.real-img {
-            display: block;
-        }
-
-        .view-toggle-hint {
-            position: absolute;
-            bottom: 6px;
-            font-size: 0.6rem;
-            color: rgba(255, 255, 255, 0.2);
-            pointer-events: none;
-            transition: opacity 0.2s;
+        .illustration svg {
+            width: 75%;
+            height: 75%;
         }
 
         .position-name {
@@ -175,7 +157,6 @@
             margin-top: 16px;
         }
 
-        /* Animation d'entrée */
         .fade-in {
             animation: fadeSlide 0.5s ease forwards;
         }
@@ -241,7 +222,6 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Panel liste */
         .list-overlay {
             position: fixed;
             inset: 0;
@@ -371,6 +351,13 @@
             align-items: center;
             justify-content: center;
             border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        .list-item-icon img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
         }
 
         .list-item-icon svg {
@@ -443,9 +430,7 @@
     </div>
 
     <div class="card" id="card" onclick="generate()">
-        <div class="illustration" id="illustration" onclick="toggleView(event)">
-            <span class="view-toggle-hint" id="viewToggleHint"></span>
-        </div>
+        <div class="illustration" id="illustration"></div>
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
@@ -456,7 +441,6 @@
 
     <footer>Have fun !</footer>
 
-    <!-- Panel liste -->
     <div class="list-overlay" id="listOverlay" onclick="closeList()"></div>
     <div class="list-panel" id="listPanel">
         <div class="list-handle"></div>
@@ -468,1361 +452,627 @@
     </div>
 
     <script>
+        const IMG_BASE = 'https://raw.githubusercontent.com/vise950/Libido/master/assets/images/';
+
         const positions = [
+            // ===== FACILE =====
             {
                 name: "Missionnaire",
                 desc: "Le classique indémodable. Face à face, l'un allongé sur l'autre. Parfait pour l'intimité et le contact visuel.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en dessous -->
-                    <circle cx="30" cy="100" r="10"/>
-                    <line x1="40" y1="100" x2="100" y2="105"/>
-                    <line x1="100" y1="105" x2="130" y2="130"/>
-                    <line x1="100" y1="105" x2="125" y2="85"/>
-                    <line x1="50" y1="95" x2="55" y2="75"/>
-                    <line x1="50" y1="105" x2="55" y2="125"/>
-                    <!-- Personne au dessus -->
-                    <circle cx="45" cy="60" r="10" stroke="#e94560"/>
-                    <line x1="55" y1="65" x2="95" y2="85" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="115" y2="110" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="120" y2="70" stroke="#e94560"/>
-                    <line x1="65" y1="70" x2="45" y2="85" stroke="#e94560"/>
-                    <line x1="65" y1="75" x2="70" y2="95" stroke="#e94560"/>
-                </svg>`
+                img: "ic_classic.png"
             },
             {
                 name: "Levrette",
                 desc: "Un classique aussi. L'un à quatre pattes, l'autre derrière. Permet de varier les angles et l'intensité.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne devant à 4 pattes -->
-                    <circle cx="40" cy="55" r="10"/>
-                    <line x1="50" y1="58" x2="85" y2="70"/>
-                    <line x1="85" y1="70" x2="70" y2="110"/>
-                    <line x1="85" y1="70" x2="100" y2="110"/>
-                    <line x1="55" y1="62" x2="35" y2="100"/>
-                    <line x1="55" y1="62" x2="55" y2="100"/>
-                    <!-- Personne derrière -->
-                    <circle cx="115" cy="45" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="55" x2="105" y2="80" stroke="#e94560"/>
-                    <line x1="105" y1="80" x2="90" y2="115" stroke="#e94560"/>
-                    <line x1="105" y1="80" x2="115" y2="115" stroke="#e94560"/>
-                    <line x1="110" y1="65" x2="95" y2="55" stroke="#e94560"/>
-                    <line x1="112" y1="68" x2="130" y2="60" stroke="#e94560"/>
-                </svg>`
+                img: "ic_doggy_style.png"
             },
             {
                 name: "Amazone",
-                desc: "L'un allongé, l'autre assis(e) dessus face à face. Idéal pour que la personne du dessus contrôle le rythme.",
+                desc: "Elle est assise sur lui, face à face. Elle contrôle le rythme et la profondeur. Très intime.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="110" r="10"/>
-                    <line x1="35" y1="112" x2="100" y2="115"/>
-                    <line x1="100" y1="115" x2="130" y2="135"/>
-                    <line x1="100" y1="115" x2="135" y2="100"/>
-                    <line x1="50" y1="108" x2="40" y2="90"/>
-                    <line x1="50" y1="118" x2="40" y2="135"/>
-                    <!-- Personne assise dessus -->
-                    <circle cx="80" cy="50" r="10" stroke="#e94560"/>
-                    <line x1="80" y1="60" x2="80" y2="90" stroke="#e94560"/>
-                    <line x1="80" y1="90" x2="60" y2="115" stroke="#e94560"/>
-                    <line x1="80" y1="90" x2="100" y2="115" stroke="#e94560"/>
-                    <line x1="80" y1="70" x2="60" y2="60" stroke="#e94560"/>
-                    <line x1="80" y1="70" x2="100" y2="60" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Amazone inversée",
-                desc: "Comme l'amazone, mais la personne du dessus est tournée dos. Offre un angle différent et beaucoup de contrôle.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="110" r="10"/>
-                    <line x1="35" y1="112" x2="100" y2="115"/>
-                    <line x1="100" y1="115" x2="130" y2="135"/>
-                    <line x1="100" y1="115" x2="135" y2="100"/>
-                    <line x1="50" y1="108" x2="40" y2="90"/>
-                    <line x1="50" y1="118" x2="40" y2="135"/>
-                    <!-- Personne assise dos tourné -->
-                    <circle cx="85" cy="50" r="10" stroke="#e94560"/>
-                    <line x1="85" y1="60" x2="82" y2="90" stroke="#e94560"/>
-                    <line x1="82" y1="90" x2="65" y2="115" stroke="#e94560"/>
-                    <line x1="82" y1="90" x2="100" y2="115" stroke="#e94560"/>
-                    <line x1="85" y1="70" x2="105" y2="78" stroke="#e94560"/>
-                    <line x1="85" y1="70" x2="65" y2="78" stroke="#e94560"/>
-                </svg>`
+                img: "ic_amazon.png"
             },
             {
                 name: "Cuillère",
-                desc: "Allongés sur le côté, l'un derrière l'autre. Très intime et détendu, parfait pour les matins câlins.",
+                desc: "Allongés sur le côté, emboîtés l'un contre l'autre. Doux, tendre et parfait pour le matin.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne devant -->
-                    <circle cx="45" cy="60" r="10"/>
-                    <path d="M 50 68 Q 65 90 55 110"/>
-                    <line x1="55" y1="110" x2="40" y2="140"/>
-                    <line x1="55" y1="110" x2="65" y2="140"/>
-                    <line x1="50" y1="80" x2="30" y2="75"/>
-                    <line x1="50" y1="85" x2="35" y2="100"/>
-                    <!-- Personne derrière -->
-                    <circle cx="75" cy="55" r="10" stroke="#e94560"/>
-                    <path d="M 78 63 Q 90 85 80 108" stroke="#e94560"/>
-                    <line x1="80" y1="108" x2="65" y2="138" stroke="#e94560"/>
-                    <line x1="80" y1="108" x2="90" y2="138" stroke="#e94560"/>
-                    <line x1="82" y1="75" x2="55" y2="85" stroke="#e94560"/>
-                    <line x1="82" y1="80" x2="100" y2="75" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Lotus",
-                desc: "L'un assis en tailleur, l'autre sur ses genoux face à face, jambes enroulées. Ultra intime, beaucoup de contact.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne assise -->
-                    <circle cx="70" cy="45" r="10"/>
-                    <line x1="70" y1="55" x2="70" y2="95"/>
-                    <path d="M 70 95 Q 45 105 40 115"/>
-                    <path d="M 70 95 Q 95 105 100 115"/>
-                    <line x1="70" y1="70" x2="45" y2="65"/>
-                    <line x1="70" y1="70" x2="95" y2="65"/>
-                    <!-- Personne sur les genoux -->
-                    <circle cx="85" cy="35" r="10" stroke="#e94560"/>
-                    <line x1="85" y1="45" x2="82" y2="85" stroke="#e94560"/>
-                    <path d="M 82 85 Q 60 100 50 95" stroke="#e94560"/>
-                    <path d="M 82 85 Q 105 100 110 95" stroke="#e94560"/>
-                    <line x1="83" y1="60" x2="55" y2="50" stroke="#e94560"/>
-                    <line x1="83" y1="60" x2="105" y2="50" stroke="#e94560"/>
-                </svg>`
+                img: "ic_slide.png"
             },
             {
                 name: "Andromaque",
-                desc: "L'un assis sur une chaise ou bord du lit, l'autre sur ses genoux face à face. Bon contrôle et intimité.",
+                desc: "Elle chevauche, mains posées sur son torse. Un classique qui donne le contrôle total.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Chaise -->
-                    <rect x="50" y="85" width="45" height="5" rx="2" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="53" y1="90" x2="53" y2="140" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="92" y1="90" x2="92" y2="140" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="92" y1="85" x2="92" y2="55" stroke="rgba(255,255,255,0.3)"/>
-                    <!-- Personne assise -->
-                    <circle cx="72" cy="50" r="10"/>
-                    <line x1="72" y1="60" x2="72" y2="88"/>
-                    <line x1="72" y1="88" x2="50" y2="120"/>
-                    <line x1="72" y1="88" x2="95" y2="120"/>
-                    <line x1="72" y1="72" x2="52" y2="78"/>
-                    <line x1="72" y1="72" x2="92" y2="78"/>
-                    <!-- Personne dessus -->
-                    <circle cx="72" cy="20" r="10" stroke="#e94560"/>
-                    <line x1="72" y1="30" x2="72" y2="65" stroke="#e94560"/>
-                    <line x1="72" y1="65" x2="48" y2="88" stroke="#e94560"/>
-                    <line x1="72" y1="65" x2="96" y2="88" stroke="#e94560"/>
-                    <line x1="72" y1="42" x2="55" y2="35" stroke="#e94560"/>
-                    <line x1="72" y1="42" x2="90" y2="35" stroke="#e94560"/>
-                </svg>`
+                img: "ic_rocking_horse.png"
             },
             {
                 name: "69",
-                desc: "Tête-bêche, plaisir oral mutuel simultané. L'un au-dessus ou côte à côte, chacun s'occupe de l'autre.",
+                desc: "Tête-bêche, plaisir oral mutuel et simultané. Position iconique de réciprocité.",
                 difficulty: "facile",
                 svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 -->
                     <circle cx="30" cy="65" r="10"/>
-                    <line x1="40" y1="67" x2="90" y2="75"/>
-                    <line x1="90" y1="75" x2="115" y2="55"/>
-                    <line x1="90" y1="75" x2="120" y2="90"/>
-                    <line x1="55" y1="65" x2="50" y2="50"/>
-                    <line x1="55" y1="73" x2="50" y2="90"/>
-                    <!-- Personne 2 inversée -->
+                    <line x1="40" y1="65" x2="90" y2="60"/>
+                    <line x1="90" y1="60" x2="120" y2="40"/>
+                    <line x1="90" y1="60" x2="115" y2="75"/>
+                    <line x1="55" y1="60" x2="50" y2="40"/>
+                    <line x1="55" y1="65" x2="50" y2="85"/>
                     <circle cx="130" cy="100" r="10" stroke="#e94560"/>
-                    <line x1="120" y1="98" x2="70" y2="90" stroke="#e94560"/>
-                    <line x1="70" y1="90" x2="45" y2="110" stroke="#e94560"/>
-                    <line x1="70" y1="90" x2="40" y2="75" stroke="#e94560"/>
-                    <line x1="105" y1="100" x2="110" y2="115" stroke="#e94560"/>
-                    <line x1="105" y1="92" x2="110" y2="75" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Brouette",
-                desc: "L'un tient les jambes de l'autre qui s'appuie sur les mains. Athlétique et intense. Bon échauffement conseillé !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en appui sur les mains -->
-                    <circle cx="35" cy="70" r="10"/>
-                    <line x1="40" y1="78" x2="55" y2="95"/>
-                    <line x1="55" y1="95" x2="100" y2="80"/>
-                    <line x1="55" y1="95" x2="30" y2="120"/>
-                    <line x1="55" y1="95" x2="55" y2="125"/>
-                    <!-- Personne debout qui tient les jambes -->
-                    <circle cx="115" cy="35" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="45" x2="115" y2="85" stroke="#e94560"/>
-                    <line x1="115" y1="85" x2="100" y2="130" stroke="#e94560"/>
-                    <line x1="115" y1="85" x2="130" y2="130" stroke="#e94560"/>
-                    <line x1="115" y1="60" x2="95" y2="72" stroke="#e94560"/>
-                    <line x1="115" y1="60" x2="105" y2="78" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'union du loup",
-                desc: "Debout, l'un soulève la jambe de l'autre. Intense et passionné, idéal contre un mur pour plus de stabilité.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 debout -->
-                    <circle cx="65" cy="25" r="10"/>
-                    <line x1="65" y1="35" x2="65" y2="85"/>
-                    <line x1="65" y1="85" x2="50" y2="140"/>
-                    <line x1="65" y1="85" x2="80" y2="140"/>
-                    <line x1="65" y1="55" x2="45" y2="65"/>
-                    <line x1="65" y1="55" x2="85" y2="50"/>
-                    <!-- Personne 2 debout jambe levée -->
-                    <circle cx="95" cy="25" r="10" stroke="#e94560"/>
-                    <line x1="95" y1="35" x2="90" y2="85" stroke="#e94560"/>
-                    <line x1="90" y1="85" x2="100" y2="140" stroke="#e94560"/>
-                    <line x1="90" y1="85" x2="70" y2="60" stroke="#e94560"/>
-                    <line x1="95" y1="55" x2="115" y2="45" stroke="#e94560"/>
-                    <line x1="95" y1="55" x2="110" y2="70" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le pont",
-                desc: "L'un fait le pont (dos cambré, mains au sol), l'autre est agenouillé. Demande de la souplesse !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en pont -->
-                    <circle cx="30" cy="90" r="10"/>
-                    <path d="M 38 85 Q 70 40 110 85"/>
-                    <line x1="110" y1="85" x2="120" y2="115"/>
-                    <line x1="110" y1="85" x2="100" y2="115"/>
-                    <line x1="38" y1="88" x2="25" y2="115"/>
-                    <line x1="38" y1="92" x2="42" y2="115"/>
-                    <!-- Personne à genoux -->
-                    <circle cx="120" cy="40" r="10" stroke="#e94560"/>
-                    <line x1="120" y1="50" x2="118" y2="80" stroke="#e94560"/>
-                    <line x1="118" y1="80" x2="105" y2="115" stroke="#e94560"/>
-                    <line x1="118" y1="80" x2="130" y2="115" stroke="#e94560"/>
-                    <line x1="119" y1="62" x2="100" y2="58" stroke="#e94560"/>
-                    <line x1="119" y1="62" x2="140" y2="58" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La balançoire",
-                desc: "L'un assis au bord du lit, l'autre sur ses genoux dos tourné, pieds au sol. Bon angle et rythme facile à contrôler.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Surface -->
-                    <line x1="30" y1="95" x2="110" y2="95" stroke="rgba(255,255,255,0.3)"/>
-                    <!-- Personne assise -->
-                    <circle cx="70" cy="50" r="10"/>
-                    <line x1="70" y1="60" x2="70" y2="93"/>
-                    <line x1="70" y1="93" x2="50" y2="130"/>
-                    <line x1="70" y1="93" x2="90" y2="130"/>
-                    <line x1="70" y1="73" x2="50" y2="80"/>
-                    <line x1="70" y1="73" x2="90" y2="80"/>
-                    <!-- Personne dos tourné sur genoux -->
-                    <circle cx="75" cy="22" r="10" stroke="#e94560"/>
-                    <line x1="75" y1="32" x2="73" y2="70" stroke="#e94560"/>
-                    <line x1="73" y1="70" x2="55" y2="95" stroke="#e94560"/>
-                    <line x1="73" y1="70" x2="95" y2="95" stroke="#e94560"/>
-                    <line x1="74" y1="48" x2="95" y2="42" stroke="#e94560"/>
-                    <line x1="74" y1="48" x2="55" y2="42" stroke="#e94560"/>
+                    <line x1="120" y1="100" x2="70" y2="105" stroke="#e94560"/>
+                    <line x1="70" y1="105" x2="45" y2="120" stroke="#e94560"/>
+                    <line x1="70" y1="105" x2="50" y2="90" stroke="#e94560"/>
+                    <line x1="105" y1="105" x2="110" y2="120" stroke="#e94560"/>
+                    <line x1="105" y1="100" x2="110" y2="80" stroke="#e94560"/>
                 </svg>`
             },
             {
                 name: "L'étoile de mer",
-                desc: "Face à face, assis, penchés en arrière en appui sur les mains, jambes entrelacées. Visuel et rythmé.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 -->
-                    <circle cx="40" cy="50" r="10"/>
-                    <line x1="48" y1="55" x2="65" y2="80"/>
-                    <line x1="65" y1="80" x2="90" y2="100"/>
-                    <line x1="65" y1="80" x2="50" y2="110"/>
-                    <line x1="48" y1="60" x2="25" y2="85"/>
-                    <line x1="45" y1="58" x2="30" y2="45"/>
-                    <!-- Personne 2 -->
-                    <circle cx="120" cy="50" r="10" stroke="#e94560"/>
-                    <line x1="112" y1="55" x2="95" y2="80" stroke="#e94560"/>
-                    <line x1="95" y1="80" x2="70" y2="100" stroke="#e94560"/>
-                    <line x1="95" y1="80" x2="110" y2="110" stroke="#e94560"/>
-                    <line x1="112" y1="60" x2="135" y2="85" stroke="#e94560"/>
-                    <line x1="116" y1="58" x2="130" y2="45" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Debout face à face",
-                desc: "Tous les deux debout, face à face. Simple mais efficace, surtout sous la douche ou contre un mur.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 -->
-                    <circle cx="60" cy="25" r="10"/>
-                    <line x1="60" y1="35" x2="60" y2="85"/>
-                    <line x1="60" y1="85" x2="45" y2="140"/>
-                    <line x1="60" y1="85" x2="70" y2="140"/>
-                    <line x1="60" y1="55" x2="78" y2="50"/>
-                    <line x1="60" y1="55" x2="42" y2="65"/>
-                    <!-- Personne 2 -->
-                    <circle cx="100" cy="25" r="10" stroke="#e94560"/>
-                    <line x1="100" y1="35" x2="100" y2="85" stroke="#e94560"/>
-                    <line x1="100" y1="85" x2="90" y2="140" stroke="#e94560"/>
-                    <line x1="100" y1="85" x2="115" y2="140" stroke="#e94560"/>
-                    <line x1="100" y1="55" x2="82" y2="50" stroke="#e94560"/>
-                    <line x1="100" y1="55" x2="118" y2="65" stroke="#e94560"/>
-                </svg>`
+                desc: "Il est allongé sur le dos, bras et jambes écartés. Elle s'installe sur lui et gère tout le mouvement.",
+                difficulty: "facile",
+                img: "ic_star.png"
             },
             {
                 name: "La chaise longue",
-                desc: "L'un allongé sur le dos, jambes pliées. L'autre s'assoit dos tourné entre les jambes. Détendu et agréable.",
+                desc: "Il est allongé, elle s'assied sur lui en s'inclinant en arrière, dos contre son torse.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée jambes pliées -->
-                    <circle cx="25" cy="95" r="10"/>
-                    <line x1="35" y1="97" x2="85" y2="100"/>
-                    <line x1="85" y1="100" x2="105" y2="80"/>
-                    <line x1="105" y1="80" x2="105" y2="110"/>
-                    <line x1="85" y1="100" x2="110" y2="90"/>
-                    <line x1="110" y1="90" x2="115" y2="115"/>
-                    <line x1="45" y1="92" x2="35" y2="75"/>
-                    <!-- Personne assise -->
-                    <circle cx="90" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="90" y1="52" x2="88" y2="85" stroke="#e94560"/>
-                    <line x1="88" y1="85" x2="70" y2="105" stroke="#e94560"/>
-                    <line x1="88" y1="85" x2="105" y2="105" stroke="#e94560"/>
-                    <line x1="89" y1="65" x2="72" y2="58" stroke="#e94560"/>
-                    <line x1="89" y1="65" x2="108" y2="58" stroke="#e94560"/>
-                </svg>`
+                img: "ic_deckchair.png"
             },
             {
-                name: "Le berceau",
-                desc: "L'un assis, jambes allongées. L'autre s'assoit face à face sur ses cuisses, jambes autour de la taille. Très tendre.",
+                name: "La séduction",
+                desc: "Position allongée très intime, corps enlacés, visages proches. Tendresse et sensualité.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne assise -->
-                    <circle cx="65" cy="40" r="10"/>
-                    <line x1="65" y1="50" x2="65" y2="90"/>
-                    <line x1="65" y1="90" x2="50" y2="140"/>
-                    <line x1="65" y1="90" x2="80" y2="140"/>
-                    <line x1="65" y1="68" x2="85" y2="62"/>
-                    <line x1="65" y1="68" x2="48" y2="75"/>
-                    <!-- Personne face assise sur cuisses -->
-                    <circle cx="90" cy="35" r="10" stroke="#e94560"/>
-                    <line x1="90" y1="45" x2="85" y2="80" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="55" y2="95" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="100" y2="100" stroke="#e94560"/>
-                    <line x1="88" y1="58" x2="72" y2="52" stroke="#e94560"/>
-                    <line x1="88" y1="58" x2="108" y2="52" stroke="#e94560"/>
-                </svg>`
+                img: "ic_seduction.png"
             },
             {
-                name: "La grenouille",
-                desc: "L'un allongé, l'autre accroupi(e) dessus en position de grenouille. Beaucoup de contrôle pour la personne du dessus.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="110" r="10"/>
-                    <line x1="35" y1="112" x2="100" y2="115"/>
-                    <line x1="100" y1="115" x2="130" y2="130"/>
-                    <line x1="100" y1="115" x2="135" y2="100"/>
-                    <line x1="50" y1="108" x2="40" y2="95"/>
-                    <line x1="50" y1="118" x2="40" y2="132"/>
-                    <!-- Personne accroupie -->
-                    <circle cx="80" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="80" y1="52" x2="80" y2="80" stroke="#e94560"/>
-                    <line x1="80" y1="80" x2="55" y2="90" stroke="#e94560"/>
-                    <line x1="55" y1="90" x2="55" y2="115" stroke="#e94560"/>
-                    <line x1="80" y1="80" x2="105" y2="90" stroke="#e94560"/>
-                    <line x1="105" y1="90" x2="105" y2="115" stroke="#e94560"/>
-                    <line x1="80" y1="62" x2="62" y2="55" stroke="#e94560"/>
-                    <line x1="80" y1="62" x2="98" y2="55" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le ciseaux",
-                desc: "Allongés perpendiculairement, jambes entrelacées en ciseaux. Relaxant, bon angle et pas fatigant du tout.",
+                name: "Le nirvana",
+                desc: "Variante du missionnaire où elle garde les jambes serrées. Plus de friction, sensations décuplées.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 horizontale -->
-                    <circle cx="15" cy="75" r="10"/>
-                    <line x1="25" y1="78" x2="70" y2="85"/>
-                    <line x1="70" y1="85" x2="100" y2="70"/>
-                    <line x1="70" y1="85" x2="95" y2="105"/>
-                    <line x1="40" y1="76" x2="30" y2="60"/>
-                    <line x1="40" y1="82" x2="30" y2="100"/>
-                    <!-- Personne 2 en angle -->
-                    <circle cx="140" cy="55" r="10" stroke="#e94560"/>
-                    <line x1="132" y1="60" x2="90" y2="80" stroke="#e94560"/>
-                    <line x1="90" y1="80" x2="65" y2="65" stroke="#e94560"/>
-                    <line x1="90" y1="80" x2="70" y2="105" stroke="#e94560"/>
-                    <line x1="115" y1="68" x2="125" y2="85" stroke="#e94560"/>
-                    <line x1="115" y1="65" x2="120" y2="48" stroke="#e94560"/>
-                </svg>`
+                img: "ic_nirvana.png"
             },
             {
-                name: "La pieuvre",
-                desc: "Assis face à face, jambes par-dessus les épaules de l'autre. Demande de la souplesse mais très connecté.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 -->
-                    <circle cx="55" cy="40" r="10"/>
-                    <line x1="55" y1="50" x2="55" y2="90"/>
-                    <line x1="55" y1="90" x2="95" y2="55"/>
-                    <line x1="55" y1="90" x2="35" y2="120"/>
-                    <line x1="55" y1="65" x2="35" y2="60"/>
-                    <line x1="55" y1="65" x2="75" y2="60"/>
-                    <!-- Personne 2 -->
-                    <circle cx="105" cy="40" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="50" x2="105" y2="90" stroke="#e94560"/>
-                    <line x1="105" y1="90" x2="65" y2="55" stroke="#e94560"/>
-                    <line x1="105" y1="90" x2="125" y2="120" stroke="#e94560"/>
-                    <line x1="105" y1="65" x2="85" y2="60" stroke="#e94560"/>
-                    <line x1="105" y1="65" x2="125" y2="60" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le porteur",
-                desc: "L'un porte l'autre, face à face, debout. Très passionné, idéal contre un mur. Demande de la force !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne qui porte -->
-                    <circle cx="70" cy="30" r="10"/>
-                    <line x1="70" y1="40" x2="70" y2="90"/>
-                    <line x1="70" y1="90" x2="55" y2="140"/>
-                    <line x1="70" y1="90" x2="85" y2="140"/>
-                    <line x1="70" y1="60" x2="90" y2="75"/>
-                    <line x1="70" y1="60" x2="50" y2="75"/>
-                    <!-- Personne portée -->
-                    <circle cx="92" cy="28" r="10" stroke="#e94560"/>
-                    <line x1="92" y1="38" x2="88" y2="72" stroke="#e94560"/>
-                    <line x1="88" y1="72" x2="60" y2="65" stroke="#e94560"/>
-                    <line x1="88" y1="72" x2="62" y2="85" stroke="#e94560"/>
-                    <line x1="90" y1="50" x2="78" y2="42" stroke="#e94560"/>
-                    <line x1="90" y1="50" x2="110" y2="42" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'équerre",
-                desc: "L'un allongé sur le côté, l'autre à genoux perpendiculairement. Angle de pénétration unique et bonne profondeur.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée sur le côté -->
-                    <circle cx="20" cy="90" r="10"/>
-                    <line x1="30" y1="92" x2="75" y2="95"/>
-                    <line x1="75" y1="95" x2="95" y2="75"/>
-                    <line x1="75" y1="95" x2="90" y2="115"/>
-                    <line x1="45" y1="88" x2="35" y2="72"/>
-                    <line x1="45" y1="96" x2="35" y2="112"/>
-                    <!-- Personne à genoux -->
-                    <circle cx="105" cy="40" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="50" x2="105" y2="80" stroke="#e94560"/>
-                    <line x1="105" y1="80" x2="90" y2="110" stroke="#e94560"/>
-                    <line x1="90" y1="110" x2="90" y2="135" stroke="#e94560"/>
-                    <line x1="105" y1="80" x2="120" y2="110" stroke="#e94560"/>
-                    <line x1="120" y1="110" x2="120" y2="135" stroke="#e94560"/>
-                    <line x1="105" y1="62" x2="88" y2="72" stroke="#e94560"/>
-                    <line x1="105" y1="62" x2="122" y2="58" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La chaise",
-                desc: "L'un assis sur une chaise, l'autre dos tourné s'assoit sur ses genoux, pieds au sol. Contrôle partagé.",
+                name: "Le tigre couché",
+                desc: "Elle est à plat ventre, lui par-dessus. Pénétration douce avec tout le poids du corps en contact.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Chaise -->
-                    <rect x="45" y="85" width="50" height="5" rx="2" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="48" y1="90" x2="48" y2="140" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="92" y1="90" x2="92" y2="140" stroke="rgba(255,255,255,0.3)"/>
-                    <line x1="48" y1="85" x2="48" y2="55" stroke="rgba(255,255,255,0.3)"/>
-                    <!-- Personne assise -->
-                    <circle cx="70" cy="45" r="10"/>
-                    <line x1="70" y1="55" x2="70" y2="88"/>
-                    <line x1="70" y1="88" x2="50" y2="120"/>
-                    <line x1="70" y1="88" x2="90" y2="120"/>
-                    <line x1="70" y1="68" x2="52" y2="62"/>
-                    <line x1="70" y1="68" x2="88" y2="62"/>
-                    <!-- Personne dos tourné sur genoux -->
-                    <circle cx="75" cy="18" r="10" stroke="#e94560"/>
-                    <line x1="75" y1="28" x2="73" y2="65" stroke="#e94560"/>
-                    <line x1="73" y1="65" x2="55" y2="88" stroke="#e94560"/>
-                    <line x1="55" y1="88" x2="45" y2="120" stroke="#e94560"/>
-                    <line x1="73" y1="65" x2="95" y2="88" stroke="#e94560"/>
-                    <line x1="95" y1="88" x2="100" y2="120" stroke="#e94560"/>
-                    <line x1="74" y1="42" x2="95" y2="36" stroke="#e94560"/>
-                    <line x1="74" y1="42" x2="55" y2="36" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'arbre à souhaits",
-                desc: "L'un debout, l'autre enroule une jambe autour de sa taille. Romantique et spontané, parfait contre un mur.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Mur -->
-                    <line x1="30" y1="10" x2="30" y2="150" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
-                    <!-- Personne 1 debout -->
-                    <circle cx="60" cy="25" r="10"/>
-                    <line x1="60" y1="35" x2="60" y2="88"/>
-                    <line x1="60" y1="88" x2="48" y2="142"/>
-                    <line x1="60" y1="88" x2="72" y2="142"/>
-                    <line x1="60" y1="55" x2="42" y2="48"/>
-                    <line x1="60" y1="55" x2="78" y2="52"/>
-                    <!-- Personne 2 jambe enroulée -->
-                    <circle cx="90" cy="25" r="10" stroke="#e94560"/>
-                    <line x1="90" y1="35" x2="85" y2="88" stroke="#e94560"/>
-                    <line x1="85" y1="88" x2="95" y2="142" stroke="#e94560"/>
-                    <line x1="85" y1="88" x2="65" y2="70" stroke="#e94560"/>
-                    <line x1="90" y1="55" x2="108" y2="48" stroke="#e94560"/>
-                    <line x1="90" y1="55" x2="105" y2="65" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La danse du loup",
-                desc: "Debout, elle se penche en avant tandis qu'il la pénètre par derrière. Sauvage et stimulant, angle profond.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 penchée en avant, tête vers la gauche (dos à l'autre) -->
-                    <circle cx="30" cy="58" r="10"/>
-                    <line x1="38" y1="62" x2="75" y2="80"/>
-                    <line x1="75" y1="80" x2="60" y2="135"/>
-                    <line x1="75" y1="80" x2="88" y2="135"/>
-                    <line x1="50" y1="68" x2="22" y2="72"/>
-                    <line x1="50" y1="68" x2="28" y2="85"/>
-                    <!-- Personne 2 debout, dos tourné vers personne 1 -->
-                    <circle cx="115" cy="30" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="40" x2="95" y2="85" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="85" y2="140" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="108" y2="140" stroke="#e94560"/>
-                    <line x1="108" y1="58" x2="88" y2="72" stroke="#e94560"/>
-                    <line x1="108" y1="58" x2="128" y2="52" stroke="#e94560"/>
-                </svg>`
+                img: "ic_prone_tiger.png"
             },
             {
                 name: "Le papillon",
-                desc: "L'un allongé au bord du lit, fesses au bord, jambes en l'air. L'autre debout face à face. Angle parfait.",
+                desc: "Elle est allongée au bord du lit, jambes relevées. Il se tient debout devant elle.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Bord du lit -->
-                    <line x1="10" y1="100" x2="85" y2="100" stroke="rgba(255,255,255,0.25)" stroke-width="3"/>
-                    <!-- Personne allongée bord du lit -->
-                    <circle cx="20" cy="85" r="10"/>
-                    <line x1="30" y1="88" x2="75" y2="95"/>
-                    <line x1="75" y1="95" x2="90" y2="65"/>
-                    <line x1="75" y1="95" x2="95" y2="80"/>
-                    <line x1="45" y1="84" x2="35" y2="70"/>
-                    <line x1="45" y1="90" x2="30" y2="100"/>
-                    <!-- Personne debout -->
-                    <circle cx="105" cy="30" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="40" x2="100" y2="88" stroke="#e94560"/>
-                    <line x1="100" y1="88" x2="88" y2="140" stroke="#e94560"/>
-                    <line x1="100" y1="88" x2="115" y2="140" stroke="#e94560"/>
-                    <line x1="103" y1="60" x2="85" y2="55" stroke="#e94560"/>
-                    <line x1="103" y1="60" x2="120" y2="55" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La planche",
-                desc: "Comme le missionnaire, mais la personne du dessus est en appui bras tendus, corps bien droit. Plus de contrôle visuel.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en dessous -->
-                    <circle cx="30" cy="105" r="10"/>
-                    <line x1="40" y1="107" x2="100" y2="112"/>
-                    <line x1="100" y1="112" x2="128" y2="130"/>
-                    <line x1="100" y1="112" x2="130" y2="95"/>
-                    <line x1="55" y1="103" x2="50" y2="85"/>
-                    <line x1="55" y1="112" x2="45" y2="128"/>
-                    <!-- Personne au dessus bras tendus -->
-                    <circle cx="40" cy="52" r="10" stroke="#e94560"/>
-                    <line x1="50" y1="56" x2="105" y2="78" stroke="#e94560"/>
-                    <line x1="105" y1="78" x2="120" y2="105" stroke="#e94560"/>
-                    <line x1="105" y1="78" x2="128" y2="68" stroke="#e94560"/>
-                    <line x1="58" y1="58" x2="42" y2="90" stroke="#e94560"/>
-                    <line x1="68" y1="64" x2="68" y2="92" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le toboggan",
-                desc: "L'un allongé sur le ventre, jambes serrées. L'autre allongé dessus dans le même sens. Sensations intenses.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en dessous sur le ventre -->
-                    <circle cx="28" cy="105" r="10"/>
-                    <line x1="38" y1="108" x2="100" y2="112"/>
-                    <line x1="100" y1="112" x2="132" y2="118"/>
-                    <line x1="100" y1="112" x2="130" y2="105"/>
-                    <line x1="52" y1="104" x2="48" y2="88"/>
-                    <line x1="52" y1="110" x2="45" y2="125"/>
-                    <!-- Personne allongée par dessus -->
-                    <circle cx="35" cy="75" r="10" stroke="#e94560"/>
-                    <line x1="45" y1="78" x2="105" y2="90" stroke="#e94560"/>
-                    <line x1="105" y1="90" x2="130" y2="98" stroke="#e94560"/>
-                    <line x1="105" y1="90" x2="132" y2="82" stroke="#e94560"/>
-                    <line x1="58" y1="76" x2="55" y2="62" stroke="#e94560"/>
-                    <line x1="58" y1="80" x2="50" y2="95" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le pilier",
-                desc: "L'un debout, l'autre à genoux devant. Position classique pour le plaisir oral, simple et efficace.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne debout -->
-                    <circle cx="90" cy="20" r="10"/>
-                    <line x1="90" y1="30" x2="90" y2="82"/>
-                    <line x1="90" y1="82" x2="75" y2="140"/>
-                    <line x1="90" y1="82" x2="105" y2="140"/>
-                    <line x1="90" y1="50" x2="70" y2="55"/>
-                    <line x1="90" y1="50" x2="110" y2="55"/>
-                    <!-- Personne à genoux devant -->
-                    <circle cx="58" cy="72" r="10" stroke="#e94560"/>
-                    <line x1="65" y1="78" x2="70" y2="105" stroke="#e94560"/>
-                    <line x1="70" y1="105" x2="50" y2="115" stroke="#e94560"/>
-                    <line x1="50" y1="115" x2="48" y2="140" stroke="#e94560"/>
-                    <line x1="70" y1="105" x2="85" y2="115" stroke="#e94560"/>
-                    <line x1="85" y1="115" x2="88" y2="140" stroke="#e94560"/>
-                    <line x1="66" y1="88" x2="48" y2="82" stroke="#e94560"/>
-                    <line x1="66" y1="88" x2="82" y2="78" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La cascade",
-                desc: "L'un allongé tête au bord du lit qui pend dans le vide, l'autre debout. Afflux de sang, sensations décuplées.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Lit -->
-                    <line x1="40" y1="90" x2="145" y2="90" stroke="rgba(255,255,255,0.25)" stroke-width="3"/>
-                    <!-- Personne allongée tête pendante -->
-                    <circle cx="30" cy="105" r="10"/>
-                    <line x1="38" y1="98" x2="80" y2="85"/>
-                    <line x1="80" y1="85" x2="110" y2="70"/>
-                    <line x1="80" y1="85" x2="105" y2="100"/>
-                    <line x1="55" y1="88" x2="50" y2="75"/>
-                    <line x1="55" y1="93" x2="42" y2="82"/>
-                    <!-- Personne debout -->
-                    <circle cx="115" cy="28" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="38" x2="112" y2="82" stroke="#e94560"/>
-                    <line x1="112" y1="82" x2="100" y2="138" stroke="#e94560"/>
-                    <line x1="112" y1="82" x2="128" y2="138" stroke="#e94560"/>
-                    <line x1="113" y1="58" x2="95" y2="52" stroke="#e94560"/>
-                    <line x1="113" y1="58" x2="130" y2="52" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le trône",
-                desc: "L'un assis sur le visage de l'autre qui est allongé. Idéal pour le plaisir oral avec domination douce.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="115" r="10"/>
-                    <line x1="35" y1="117" x2="105" y2="120"/>
-                    <line x1="105" y1="120" x2="132" y2="135"/>
-                    <line x1="105" y1="120" x2="135" y2="108"/>
-                    <line x1="55" y1="112" x2="45" y2="98"/>
-                    <line x1="55" y1="122" x2="45" y2="135"/>
-                    <!-- Personne assise au dessus du visage -->
-                    <circle cx="42" cy="55" r="10" stroke="#e94560"/>
-                    <line x1="42" y1="65" x2="42" y2="95" stroke="#e94560"/>
-                    <line x1="42" y1="95" x2="22" y2="112" stroke="#e94560"/>
-                    <line x1="42" y1="95" x2="62" y2="112" stroke="#e94560"/>
-                    <line x1="42" y1="78" x2="25" y2="72" stroke="#e94560"/>
-                    <line x1="42" y1="78" x2="60" y2="72" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La brouette japonaise",
-                desc: "L'un sur le ventre, bassin surélevé par un coussin. L'autre à genoux derrière. Profondeur maximale, très confortable.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Coussin -->
-                    <ellipse cx="72" cy="100" rx="18" ry="8" stroke="rgba(255,255,255,0.25)" fill="rgba(255,255,255,0.05)"/>
-                    <!-- Personne sur le ventre bassin surélevé -->
-                    <circle cx="25" cy="88" r="10"/>
-                    <line x1="35" y1="90" x2="72" y2="92"/>
-                    <line x1="72" y1="92" x2="95" y2="110"/>
-                    <line x1="72" y1="92" x2="100" y2="100"/>
-                    <line x1="48" y1="86" x2="38" y2="75"/>
-                    <line x1="48" y1="92" x2="38" y2="105"/>
-                    <!-- Personne à genoux derrière -->
-                    <circle cx="115" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="52" x2="110" y2="82" stroke="#e94560"/>
-                    <line x1="110" y1="82" x2="95" y2="110" stroke="#e94560"/>
-                    <line x1="95" y1="110" x2="92" y2="135" stroke="#e94560"/>
-                    <line x1="110" y1="82" x2="125" y2="110" stroke="#e94560"/>
-                    <line x1="125" y1="110" x2="128" y2="135" stroke="#e94560"/>
-                    <line x1="112" y1="65" x2="95" y2="72" stroke="#e94560"/>
-                    <line x1="112" y1="65" x2="130" y2="60" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le vautour",
-                desc: "L'un accroupi au-dessus de l'autre allongé, pieds à plat. Très profond et visuellement excitant.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="115" r="10"/>
-                    <line x1="35" y1="117" x2="100" y2="120"/>
-                    <line x1="100" y1="120" x2="128" y2="132"/>
-                    <line x1="100" y1="120" x2="132" y2="108"/>
-                    <line x1="52" y1="112" x2="42" y2="98"/>
-                    <line x1="52" y1="122" x2="42" y2="135"/>
-                    <!-- Personne accroupie pieds à plat -->
-                    <circle cx="78" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="78" y1="52" x2="78" y2="78" stroke="#e94560"/>
-                    <line x1="78" y1="78" x2="55" y2="95" stroke="#e94560"/>
-                    <line x1="55" y1="95" x2="50" y2="118" stroke="#e94560"/>
-                    <line x1="78" y1="78" x2="100" y2="95" stroke="#e94560"/>
-                    <line x1="100" y1="95" x2="105" y2="118" stroke="#e94560"/>
-                    <line x1="78" y1="62" x2="60" y2="55" stroke="#e94560"/>
-                    <line x1="78" y1="62" x2="96" y2="55" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le rodéo",
-                desc: "L'un allongé, l'autre assis dessus face à face mais penché en arrière, mains en appui sur les cuisses.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="108" r="10"/>
-                    <line x1="35" y1="110" x2="100" y2="115"/>
-                    <line x1="100" y1="115" x2="130" y2="130"/>
-                    <line x1="100" y1="115" x2="132" y2="100"/>
-                    <line x1="50" y1="106" x2="42" y2="92"/>
-                    <line x1="50" y1="115" x2="42" y2="128"/>
-                    <!-- Personne dessus penchée en arrière -->
-                    <circle cx="95" cy="38" r="10" stroke="#e94560"/>
-                    <line x1="90" y1="48" x2="78" y2="85" stroke="#e94560"/>
-                    <line x1="78" y1="85" x2="58" y2="110" stroke="#e94560"/>
-                    <line x1="78" y1="85" x2="100" y2="110" stroke="#e94560"/>
-                    <line x1="85" y1="62" x2="108" y2="88" stroke="#e94560"/>
-                    <line x1="85" y1="65" x2="105" y2="95" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le dromadaire",
-                desc: "L'un à quatre pattes, dos cambré vers le bas. L'autre à genoux derrière, torse relevé. Angle profond.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne à 4 pattes dos cambré -->
-                    <circle cx="30" cy="58" r="10"/>
-                    <path d="M 40 62 Q 62 85 85 72" stroke="white"/>
-                    <line x1="85" y1="72" x2="72" y2="112"/>
-                    <line x1="85" y1="72" x2="100" y2="112"/>
-                    <line x1="48" y1="70" x2="35" y2="108"/>
-                    <line x1="48" y1="68" x2="52" y2="108"/>
-                    <!-- Personne à genoux derrière -->
-                    <circle cx="115" cy="32" r="10" stroke="#e94560"/>
-                    <line x1="115" y1="42" x2="110" y2="78" stroke="#e94560"/>
-                    <line x1="110" y1="78" x2="95" y2="112" stroke="#e94560"/>
-                    <line x1="95" y1="112" x2="92" y2="135" stroke="#e94560"/>
-                    <line x1="110" y1="78" x2="125" y2="112" stroke="#e94560"/>
-                    <line x1="125" y1="112" x2="128" y2="135" stroke="#e94560"/>
-                    <line x1="112" y1="58" x2="95" y2="62" stroke="#e94560"/>
-                    <line x1="112" y1="58" x2="132" y2="52" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La pirouette",
-                desc: "L'un allongé, l'autre assis en amazone mais tourne à 90°, perpendiculaire. Sensations nouvelles et stimulantes.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="22" cy="110" r="10"/>
-                    <line x1="32" y1="112" x2="100" y2="115"/>
-                    <line x1="100" y1="115" x2="130" y2="128"/>
-                    <line x1="100" y1="115" x2="132" y2="102"/>
-                    <line x1="48" y1="108" x2="40" y2="95"/>
-                    <line x1="48" y1="118" x2="40" y2="132"/>
-                    <!-- Personne assise perpendiculaire (vue de côté, jambes vers le même côté) -->
-                    <circle cx="72" cy="48" r="10" stroke="#e94560"/>
-                    <line x1="72" y1="58" x2="72" y2="88" stroke="#e94560"/>
-                    <line x1="72" y1="88" x2="48" y2="100" stroke="#e94560"/>
-                    <line x1="48" y1="100" x2="38" y2="118" stroke="#e94560"/>
-                    <line x1="72" y1="88" x2="52" y2="108" stroke="#e94560"/>
-                    <line x1="52" y1="108" x2="42" y2="125" stroke="#e94560"/>
-                    <line x1="72" y1="70" x2="55" y2="62" stroke="#e94560"/>
-                    <line x1="72" y1="70" x2="92" y2="65" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'enclume",
-                desc: "Comme le missionnaire, mais les jambes de la personne du dessous sont ramenées vers la poitrine. Très profond.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en dessous jambes repliées -->
-                    <circle cx="30" cy="95" r="10"/>
-                    <line x1="40" y1="97" x2="85" y2="100"/>
-                    <line x1="85" y1="100" x2="80" y2="70"/>
-                    <line x1="80" y1="70" x2="95" y2="60"/>
-                    <line x1="85" y1="100" x2="95" y2="75"/>
-                    <line x1="95" y1="75" x2="110" y2="65"/>
-                    <line x1="50" y1="92" x2="48" y2="78"/>
-                    <line x1="50" y1="100" x2="42" y2="115"/>
-                    <!-- Personne au dessus -->
-                    <circle cx="55" cy="48" r="10" stroke="#e94560"/>
-                    <line x1="62" y1="55" x2="90" y2="80" stroke="#e94560"/>
-                    <line x1="90" y1="80" x2="105" y2="115" stroke="#e94560"/>
-                    <line x1="90" y1="80" x2="118" y2="72" stroke="#e94560"/>
-                    <line x1="70" y1="60" x2="55" y2="75" stroke="#e94560"/>
-                    <line x1="70" y1="58" x2="65" y2="78" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La toupie",
-                desc: "L'un allongé, l'autre dessus pivote à 180° pendant l'acte. Spectaculaire et intense, demande de la coordination.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée -->
-                    <circle cx="25" cy="112" r="10"/>
-                    <line x1="35" y1="114" x2="100" y2="118"/>
-                    <line x1="100" y1="118" x2="130" y2="130"/>
-                    <line x1="100" y1="118" x2="132" y2="105"/>
-                    <line x1="50" y1="110" x2="42" y2="96"/>
-                    <line x1="50" y1="118" x2="42" y2="132"/>
-                    <!-- Personne dessus en rotation (flèche circulaire) -->
-                    <circle cx="75" cy="48" r="10" stroke="#e94560"/>
-                    <line x1="75" y1="58" x2="75" y2="88" stroke="#e94560"/>
-                    <line x1="75" y1="88" x2="55" y2="112" stroke="#e94560"/>
-                    <line x1="75" y1="88" x2="98" y2="112" stroke="#e94560"/>
-                    <line x1="75" y1="68" x2="58" y2="62" stroke="#e94560"/>
-                    <line x1="75" y1="68" x2="92" y2="62" stroke="#e94560"/>
-                    <!-- Flèche de rotation -->
-                    <path d="M 55 40 A 22 22 0 0 1 95 40" stroke="rgba(233,69,96,0.4)" stroke-width="1.5" fill="none"/>
-                    <polygon points="95,35 95,45 102,40" fill="rgba(233,69,96,0.4)" stroke="none"/>
-                </svg>`
+                img: "ic_butterfly.png"
             },
             {
                 name: "Le X",
-                desc: "Allongés face à face, jambes en X entrelacées. Lent et sensuel, beaucoup de contact peau à peau.",
+                desc: "Allongés en forme de X, jambes entrelacées. Mouvements lents et sensuels, contact total.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne 1 -->
-                    <circle cx="20" cy="65" r="10"/>
-                    <line x1="30" y1="68" x2="65" y2="78"/>
-                    <line x1="65" y1="78" x2="95" y2="95"/>
-                    <line x1="65" y1="78" x2="90" y2="62"/>
-                    <line x1="40" y1="64" x2="32" y2="50"/>
-                    <line x1="40" y1="72" x2="32" y2="88"/>
-                    <!-- Personne 2 -->
-                    <circle cx="140" cy="65" r="10" stroke="#e94560"/>
-                    <line x1="130" y1="68" x2="95" y2="78" stroke="#e94560"/>
-                    <line x1="95" y1="78" x2="65" y2="95" stroke="#e94560"/>
-                    <line x1="95" y1="78" x2="70" y2="62" stroke="#e94560"/>
-                    <line x1="120" y1="64" x2="128" y2="50" stroke="#e94560"/>
-                    <line x1="120" y1="72" x2="128" y2="88" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La catapulte",
-                desc: "Missionnaire modifié : les jambes de la personne en dessous passent par-dessus les épaules de l'autre. Pénétration très profonde.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne en dessous jambes sur épaules de l'autre -->
-                    <circle cx="30" cy="100" r="10"/>
-                    <line x1="40" y1="102" x2="82" y2="105"/>
-                    <!-- Jambe gauche monte sur épaule gauche -->
-                    <line x1="82" y1="105" x2="70" y2="72"/>
-                    <line x1="70" y1="72" x2="55" y2="50"/>
-                    <!-- Jambe droite monte sur épaule droite -->
-                    <line x1="82" y1="105" x2="88" y2="72"/>
-                    <line x1="88" y1="72" x2="75" y2="50"/>
-                    <line x1="48" y1="98" x2="42" y2="82"/>
-                    <line x1="48" y1="106" x2="38" y2="120"/>
-                    <!-- Personne au dessus entre les jambes -->
-                    <circle cx="60" cy="35" r="10" stroke="#e94560"/>
-                    <line x1="66" y1="44" x2="85" y2="80" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="105" y2="115" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="115" y2="72" stroke="#e94560"/>
-                    <line x1="72" y1="55" x2="52" y2="65" stroke="#e94560"/>
-                    <line x1="72" y1="55" x2="65" y2="72" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La sirène",
-                desc: "L'un allongé sur le côté, jambes jointes. L'autre à genoux derrière, chevauche les cuisses. Intime et confortable.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Personne allongée sur le côté jambes jointes -->
-                    <circle cx="25" cy="70" r="10"/>
-                    <path d="M 33 75 Q 55 88 70 90"/>
-                    <line x1="70" y1="90" x2="100" y2="105"/>
-                    <line x1="70" y1="90" x2="95" y2="115"/>
-                    <line x1="42" y1="78" x2="28" y2="68"/>
-                    <line x1="42" y1="82" x2="30" y2="95"/>
-                    <!-- Personne à genoux derrière chevauchant les cuisses -->
-                    <circle cx="90" cy="40" r="10" stroke="#e94560"/>
-                    <line x1="90" y1="50" x2="85" y2="80" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="65" y2="100" stroke="#e94560"/>
-                    <line x1="65" y1="100" x2="62" y2="125" stroke="#e94560"/>
-                    <line x1="85" y1="80" x2="105" y2="100" stroke="#e94560"/>
-                    <line x1="105" y1="100" x2="108" y2="125" stroke="#e94560"/>
-                    <line x1="88" y1="62" x2="70" y2="58" stroke="#e94560"/>
-                    <line x1="88" y1="62" x2="108" y2="55" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'étreinte",
-                desc: "Allongés face à face, serrés l'un contre l'autre, jambes entrelacées. Maximum d'intimité et de tendresse.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="40" cy="55" r="10"/>
-                    <path d="M 48 60 Q 60 80 55 105"/>
-                    <line x1="55" y1="105" x2="45" y2="140"/>
-                    <line x1="55" y1="105" x2="70" y2="138"/>
-                    <line x1="50" y1="72" x2="72" y2="65"/>
-                    <line x1="50" y1="78" x2="38" y2="95"/>
-                    <circle cx="70" cy="52" r="10" stroke="#e94560"/>
-                    <path d="M 65 60 Q 58 78 62 105" stroke="#e94560"/>
-                    <line x1="62" y1="105" x2="75" y2="140" stroke="#e94560"/>
-                    <line x1="62" y1="105" x2="48" y2="138" stroke="#e94560"/>
-                    <line x1="63" y1="72" x2="45" y2="68" stroke="#e94560"/>
-                    <line x1="63" y1="78" x2="80" y2="90" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La bandoulière",
-                desc: "L'un allongé, une jambe de l'autre sur son épaule. Permet une pénétration profonde avec un bon angle.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="25" cy="100" r="10"/>
-                    <line x1="35" y1="102" x2="85" y2="105"/>
-                    <line x1="85" y1="105" x2="75" y2="60"/>
-                    <line x1="85" y1="105" x2="110" y2="95"/>
-                    <line x1="50" y1="98" x2="42" y2="82"/>
-                    <line x1="50" y1="108" x2="42" y2="122"/>
-                    <circle cx="105" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="52" x2="100" y2="85" stroke="#e94560"/>
-                    <line x1="100" y1="85" x2="85" y2="120" stroke="#e94560"/>
-                    <line x1="100" y1="85" x2="118" y2="118" stroke="#e94560"/>
-                    <line x1="102" y1="65" x2="82" y2="60" stroke="#e94560"/>
-                    <line x1="102" y1="65" x2="122" y2="58" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le panier",
-                desc: "Assis face à face, l'un enveloppe l'autre avec ses bras et jambes. Très enveloppant et connecté.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="60" cy="40" r="10"/>
-                    <line x1="60" y1="50" x2="60" y2="90"/>
-                    <line x1="60" y1="90" x2="40" y2="130"/>
-                    <line x1="60" y1="90" x2="80" y2="130"/>
-                    <line x1="60" y1="65" x2="82" y2="58"/>
-                    <line x1="60" y1="65" x2="42" y2="72"/>
-                    <circle cx="88" cy="38" r="10" stroke="#e94560"/>
-                    <line x1="88" y1="48" x2="82" y2="85" stroke="#e94560"/>
-                    <line x1="82" y1="85" x2="55" y2="80" stroke="#e94560"/>
-                    <line x1="82" y1="85" x2="100" y2="100" stroke="#e94560"/>
-                    <line x1="85" y1="62" x2="65" y2="55" stroke="#e94560"/>
-                    <line x1="85" y1="62" x2="105" y2="55" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La chandelle",
-                desc: "L'un fait la chandelle (épaules au sol, jambes en l'air), l'autre à genoux. Demande souplesse et équilibre !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="35" cy="120" r="10"/>
-                    <line x1="42" y1="115" x2="65" y2="90"/>
-                    <line x1="65" y1="90" x2="55" y2="45"/>
-                    <line x1="65" y1="90" x2="75" y2="48"/>
-                    <line x1="48" y1="108" x2="28" y2="105"/>
-                    <line x1="48" y1="112" x2="30" y2="120"/>
-                    <circle cx="100" cy="52" r="10" stroke="#e94560"/>
-                    <line x1="100" y1="62" x2="95" y2="90" stroke="#e94560"/>
-                    <line x1="95" y1="90" x2="80" y2="118" stroke="#e94560"/>
-                    <line x1="80" y1="118" x2="78" y2="138" stroke="#e94560"/>
-                    <line x1="95" y1="90" x2="112" y2="118" stroke="#e94560"/>
-                    <line x1="112" y1="118" x2="115" y2="138" stroke="#e94560"/>
-                    <line x1="97" y1="72" x2="78" y2="75" stroke="#e94560"/>
-                    <line x1="97" y1="72" x2="118" y2="68" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La roue",
-                desc: "Allongés en cercle, jambes et bras entrelacés en roue. Créatif et sensuel, rythme partagé.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="40" cy="60" r="10"/>
-                    <path d="M 48 65 Q 75 85 95 75"/>
-                    <line x1="95" y1="75" x2="115" y2="55"/>
-                    <line x1="95" y1="75" x2="120" y2="85"/>
-                    <line x1="55" y1="65" x2="40" y2="80"/>
-                    <line x1="52" y1="60" x2="42" y2="45"/>
-                    <circle cx="120" cy="100" r="10" stroke="#e94560"/>
-                    <path d="M 112 95 Q 85 75 65 85" stroke="#e94560"/>
-                    <line x1="65" y1="85" x2="45" y2="105" stroke="#e94560"/>
-                    <line x1="65" y1="85" x2="40" y2="75" stroke="#e94560"/>
-                    <line x1="108" y1="95" x2="120" y2="80" stroke="#e94560"/>
-                    <line x1="112" y1="102" x2="118" y2="118" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Les clés croisées",
-                desc: "Allongés perpendiculairement, jambes croisées et entrelacées. Stimulant et visuellement original.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="15" cy="70" r="10"/>
-                    <line x1="25" y1="73" x2="70" y2="82"/>
-                    <line x1="70" y1="82" x2="105" y2="65"/>
-                    <line x1="70" y1="82" x2="100" y2="100"/>
-                    <line x1="40" y1="70" x2="30" y2="55"/>
-                    <line x1="40" y1="77" x2="28" y2="90"/>
-                    <circle cx="145" cy="60" r="10" stroke="#e94560"/>
-                    <line x1="135" y1="63" x2="90" y2="75" stroke="#e94560"/>
-                    <line x1="90" y1="75" x2="55" y2="62" stroke="#e94560"/>
-                    <line x1="90" y1="75" x2="60" y2="95" stroke="#e94560"/>
-                    <line x1="120" y1="58" x2="130" y2="45" stroke="#e94560"/>
-                    <line x1="120" y1="65" x2="132" y2="78" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le tigre accroupi",
-                desc: "L'un à quatre pattes, tête basse. L'autre accroupi derrière. Profond et intense, bon contrôle.",
-                difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="30" cy="68" r="10"/>
-                    <line x1="38" y1="72" x2="75" y2="75"/>
-                    <line x1="75" y1="75" x2="58" y2="115"/>
-                    <line x1="75" y1="75" x2="90" y2="115"/>
-                    <line x1="48" y1="74" x2="32" y2="110"/>
-                    <line x1="48" y1="72" x2="48" y2="110"/>
-                    <circle cx="108" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="108" y1="52" x2="100" y2="80" stroke="#e94560"/>
-                    <line x1="100" y1="80" x2="82" y2="100" stroke="#e94560"/>
-                    <line x1="82" y1="100" x2="80" y2="125" stroke="#e94560"/>
-                    <line x1="100" y1="80" x2="118" y2="100" stroke="#e94560"/>
-                    <line x1="118" y1="100" x2="120" y2="125" stroke="#e94560"/>
-                    <line x1="104" y1="62" x2="85" y2="68" stroke="#e94560"/>
-                    <line x1="104" y1="62" x2="125" y2="55" stroke="#e94560"/>
-                </svg>`
+                img: "ic_x_rated.png"
             },
             {
                 name: "Le dauphin",
-                desc: "L'un allongé sur le ventre, dos cambré. L'autre allongé dessus, mains entrelacées. Fusionnel.",
+                desc: "Elle est à plat ventre, hanches surélevées avec un coussin. Il la pénètre par derrière, en douceur.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="30" cy="95" r="10"/>
-                    <path d="M 40 98 Q 70 85 100 100"/>
-                    <line x1="100" y1="100" x2="128" y2="108"/>
-                    <line x1="100" y1="100" x2="125" y2="95"/>
-                    <line x1="50" y1="90" x2="40" y2="78"/>
-                    <line x1="50" y1="96" x2="38" y2="110"/>
-                    <circle cx="40" cy="65" r="10" stroke="#e94560"/>
-                    <path d="M 48 70 Q 72 60 100 75" stroke="#e94560"/>
-                    <line x1="100" y1="75" x2="128" y2="82" stroke="#e94560"/>
-                    <line x1="100" y1="75" x2="125" y2="68" stroke="#e94560"/>
-                    <line x1="55" y1="65" x2="48" y2="52" stroke="#e94560"/>
-                    <line x1="55" y1="68" x2="42" y2="82" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le double pont",
-                desc: "Les deux font le pont face à face, corps cambrés. Spectaculaire, demande beaucoup de souplesse !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="25" cy="95" r="10"/>
-                    <path d="M 33 90 Q 55 50 75 85"/>
-                    <line x1="33" y1="95" x2="20" y2="120"/>
-                    <line x1="33" y1="98" x2="38" y2="120"/>
-                    <line x1="75" y1="85" x2="68" y2="115"/>
-                    <line x1="75" y1="85" x2="82" y2="115"/>
-                    <circle cx="135" cy="95" r="10" stroke="#e94560"/>
-                    <path d="M 127 90 Q 105 50 85 85" stroke="#e94560"/>
-                    <line x1="127" y1="95" x2="140" y2="120" stroke="#e94560"/>
-                    <line x1="127" y1="98" x2="122" y2="120" stroke="#e94560"/>
-                    <line x1="85" y1="85" x2="92" y2="115" stroke="#e94560"/>
-                    <line x1="85" y1="85" x2="78" y2="115" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le V érotique",
-                desc: "L'un allongé, jambes en V en l'air. L'autre à genoux entre les jambes. Grand angle d'ouverture.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="25" cy="95" r="10"/>
-                    <line x1="35" y1="97" x2="80" y2="100"/>
-                    <line x1="80" y1="100" x2="55" y2="55"/>
-                    <line x1="80" y1="100" x2="105" y2="55"/>
-                    <line x1="48" y1="93" x2="40" y2="78"/>
-                    <line x1="48" y1="100" x2="38" y2="115"/>
-                    <circle cx="95" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="95" y1="52" x2="90" y2="82" stroke="#e94560"/>
-                    <line x1="90" y1="82" x2="75" y2="115" stroke="#e94560"/>
-                    <line x1="75" y1="115" x2="72" y2="138" stroke="#e94560"/>
-                    <line x1="90" y1="82" x2="108" y2="115" stroke="#e94560"/>
-                    <line x1="108" y1="115" x2="112" y2="138" stroke="#e94560"/>
-                    <line x1="92" y1="62" x2="75" y2="68" stroke="#e94560"/>
-                    <line x1="92" y1="62" x2="112" y2="58" stroke="#e94560"/>
-                </svg>`
+                img: "ic_dolphin.png"
             },
             {
                 name: "L'éventail",
-                desc: "L'un allongé jambes ouvertes en éventail, l'autre allongé dessus. Pénétration profonde et visuelle.",
+                desc: "Elle est penchée sur une surface, jambes tendues. Il se place derrière elle. Simple et efficace.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="28" cy="100" r="10"/>
-                    <line x1="38" y1="102" x2="90" y2="105"/>
-                    <line x1="90" y1="105" x2="125" y2="80"/>
-                    <line x1="90" y1="105" x2="130" y2="125"/>
-                    <line x1="52" y1="98" x2="45" y2="82"/>
-                    <line x1="52" y1="106" x2="42" y2="120"/>
-                    <circle cx="42" cy="55" r="10" stroke="#e94560"/>
-                    <line x1="50" y1="60" x2="95" y2="82" stroke="#e94560"/>
-                    <line x1="95" y1="82" x2="118" y2="105" stroke="#e94560"/>
-                    <line x1="95" y1="82" x2="122" y2="72" stroke="#e94560"/>
-                    <line x1="60" y1="62" x2="45" y2="78" stroke="#e94560"/>
-                    <line x1="62" y1="60" x2="55" y2="80" stroke="#e94560"/>
-                </svg>`
+                img: "ic_fan.png"
             },
             {
-                name: "La galère",
-                desc: "L'un assis jambes allongées, l'autre sur ses cuisses dos tourné, jambes de chaque côté. Rythme de rame.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="55" cy="42" r="10"/>
-                    <line x1="55" y1="52" x2="55" y2="88"/>
-                    <line x1="55" y1="88" x2="40" y2="135"/>
-                    <line x1="55" y1="88" x2="70" y2="135"/>
-                    <line x1="55" y1="68" x2="38" y2="62"/>
-                    <line x1="55" y1="68" x2="72" y2="62"/>
-                    <circle cx="60" cy="15" r="10" stroke="#e94560"/>
-                    <line x1="60" y1="25" x2="58" y2="62" stroke="#e94560"/>
-                    <line x1="58" y1="62" x2="35" y2="85" stroke="#e94560"/>
-                    <line x1="58" y1="62" x2="82" y2="85" stroke="#e94560"/>
-                    <line x1="59" y1="40" x2="78" y2="35" stroke="#e94560"/>
-                    <line x1="59" y1="40" x2="42" y2="35" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le triangle",
-                desc: "L'un allongé, l'autre à genoux perpendiculaire, une jambe du partenaire sur l'épaule. Forme un triangle.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="22" cy="100" r="10"/>
-                    <line x1="32" y1="102" x2="85" y2="105"/>
-                    <line x1="85" y1="105" x2="100" y2="60"/>
-                    <line x1="85" y1="105" x2="115" y2="110"/>
-                    <line x1="50" y1="98" x2="42" y2="85"/>
-                    <line x1="50" y1="108" x2="42" y2="122"/>
-                    <circle cx="105" cy="40" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="50" x2="100" y2="82" stroke="#e94560"/>
-                    <line x1="100" y1="82" x2="85" y2="115" stroke="#e94560"/>
-                    <line x1="85" y1="115" x2="82" y2="135" stroke="#e94560"/>
-                    <line x1="100" y1="82" x2="118" y2="115" stroke="#e94560"/>
-                    <line x1="118" y1="115" x2="122" y2="135" stroke="#e94560"/>
-                    <line x1="102" y1="62" x2="88" y2="55" stroke="#e94560"/>
-                    <line x1="102" y1="62" x2="122" y2="58" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le héros",
-                desc: "L'un assis à genoux (position héros), l'autre sur ses cuisses face à face. Stable et intime.",
+                name: "L'étreinte",
+                desc: "À genoux l'un contre l'autre, corps serrés. Très intime, beaucoup de peau contre peau.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="70" cy="42" r="10"/>
-                    <line x1="70" y1="52" x2="70" y2="85"/>
-                    <line x1="70" y1="85" x2="52" y2="95"/>
-                    <line x1="52" y1="95" x2="50" y2="120"/>
-                    <line x1="70" y1="85" x2="88" y2="95"/>
-                    <line x1="88" y1="95" x2="90" y2="120"/>
-                    <line x1="70" y1="65" x2="52" y2="60"/>
-                    <line x1="70" y1="65" x2="88" y2="60"/>
-                    <circle cx="85" cy="25" r="10" stroke="#e94560"/>
-                    <line x1="85" y1="35" x2="82" y2="72" stroke="#e94560"/>
-                    <line x1="82" y1="72" x2="60" y2="88" stroke="#e94560"/>
-                    <line x1="82" y1="72" x2="102" y2="88" stroke="#e94560"/>
-                    <line x1="83" y1="50" x2="65" y2="45" stroke="#e94560"/>
-                    <line x1="83" y1="50" x2="102" y2="42" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'Indrani",
-                desc: "Missionnaire mais la personne en dessous ramène ses genoux aux oreilles. Flexibilité maximale requise.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="28" cy="90" r="10"/>
-                    <line x1="38" y1="92" x2="80" y2="95"/>
-                    <line x1="80" y1="95" x2="65" y2="65"/>
-                    <line x1="65" y1="65" x2="45" y2="68"/>
-                    <line x1="80" y1="95" x2="78" y2="65"/>
-                    <line x1="78" y1="65" x2="60" y2="60"/>
-                    <line x1="48" y1="88" x2="38" y2="75"/>
-                    <line x1="48" y1="96" x2="35" y2="108"/>
-                    <circle cx="60" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="67" y1="50" x2="85" y2="78" stroke="#e94560"/>
-                    <line x1="85" y1="78" x2="105" y2="112" stroke="#e94560"/>
-                    <line x1="85" y1="78" x2="115" y2="70" stroke="#e94560"/>
-                    <line x1="72" y1="58" x2="55" y2="70" stroke="#e94560"/>
-                    <line x1="72" y1="55" x2="62" y2="72" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "La montagne magique",
-                desc: "Les deux assis dos à dos, penchés en avant. Connexion dorsale, rythme synchronisé.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="50" cy="42" r="10"/>
-                    <line x1="55" y1="50" x2="65" y2="85"/>
-                    <line x1="65" y1="85" x2="45" y2="130"/>
-                    <line x1="65" y1="85" x2="80" y2="130"/>
-                    <line x1="58" y1="62" x2="35" y2="72"/>
-                    <line x1="58" y1="65" x2="40" y2="82"/>
-                    <circle cx="110" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="105" y1="50" x2="95" y2="85" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="80" y2="130" stroke="#e94560"/>
-                    <line x1="95" y1="85" x2="115" y2="130" stroke="#e94560"/>
-                    <line x1="102" y1="62" x2="125" y2="72" stroke="#e94560"/>
-                    <line x1="102" y1="65" x2="120" y2="82" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le rock'n'roll",
-                desc: "L'un sur le dos, jambes ramenées en arrière au-dessus de sa tête. L'autre accroupi au-dessus. Extrême !",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="50" cy="110" r="10"/>
-                    <line x1="55" y1="102" x2="65" y2="80"/>
-                    <line x1="65" y1="80" x2="40" y2="60"/>
-                    <line x1="65" y1="80" x2="55" y2="55"/>
-                    <line x1="58" y1="95" x2="35" y2="100"/>
-                    <line x1="58" y1="100" x2="38" y2="115"/>
-                    <circle cx="80" cy="38" r="10" stroke="#e94560"/>
-                    <line x1="80" y1="48" x2="78" y2="75" stroke="#e94560"/>
-                    <line x1="78" y1="75" x2="58" y2="92" stroke="#e94560"/>
-                    <line x1="58" y1="92" x2="55" y2="115" stroke="#e94560"/>
-                    <line x1="78" y1="75" x2="100" y2="92" stroke="#e94560"/>
-                    <line x1="100" y1="92" x2="105" y2="115" stroke="#e94560"/>
-                    <line x1="79" y1="58" x2="62" y2="52" stroke="#e94560"/>
-                    <line x1="79" y1="58" x2="98" y2="52" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "L'escargot",
-                desc: "L'un recroquevillé sur le dos, genoux à la poitrine. L'autre au-dessus, enveloppant. Ultra-profond.",
-                difficulty: "moyen",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="35" cy="95" r="10"/>
-                    <path d="M 42 90 Q 60 75 70 88"/>
-                    <line x1="70" y1="88" x2="55" y2="72"/>
-                    <line x1="70" y1="88" x2="65" y2="68"/>
-                    <line x1="48" y1="88" x2="40" y2="75"/>
-                    <line x1="48" y1="95" x2="38" y2="108"/>
-                    <circle cx="55" cy="42" r="10" stroke="#e94560"/>
-                    <line x1="60" y1="50" x2="72" y2="78" stroke="#e94560"/>
-                    <line x1="72" y1="78" x2="90" y2="110" stroke="#e94560"/>
-                    <line x1="72" y1="78" x2="100" y2="70" stroke="#e94560"/>
-                    <line x1="62" y1="58" x2="42" y2="62" stroke="#e94560"/>
-                    <line x1="62" y1="55" x2="50" y2="70" stroke="#e94560"/>
-                </svg>`
-            },
-            {
-                name: "Le bambou fendu",
-                desc: "Missionnaire, mais une jambe de la personne en dessous est tendue verticalement. Étirement et profondeur.",
-                difficulty: "avance",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="28" cy="98" r="10"/>
-                    <line x1="38" y1="100" x2="85" y2="103"/>
-                    <line x1="85" y1="103" x2="70" y2="30"/>
-                    <line x1="85" y1="103" x2="115" y2="108"/>
-                    <line x1="50" y1="96" x2="42" y2="80"/>
-                    <line x1="50" y1="105" x2="40" y2="118"/>
-                    <circle cx="55" cy="48" r="10" stroke="#e94560"/>
-                    <line x1="62" y1="55" x2="88" y2="80" stroke="#e94560"/>
-                    <line x1="88" y1="80" x2="108" y2="112" stroke="#e94560"/>
-                    <line x1="88" y1="80" x2="118" y2="72" stroke="#e94560"/>
-                    <line x1="70" y1="60" x2="50" y2="70" stroke="#e94560"/>
-                    <line x1="70" y1="58" x2="60" y2="75" stroke="#e94560"/>
-                </svg>`
+                img: "ic_clasp.png"
             },
             {
                 name: "L'après-midi câlin",
-                desc: "Assis au bord du lit face à face, elle sur lui, jambes autour de la taille. Lent, doux et romantique.",
+                desc: "Allongés sur le côté, détendus, en cuillère décontractée. Parfait pour un moment doux et tranquille.",
                 difficulty: "facile",
-                svg: `<svg viewBox="0 0 160 160" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="30" y1="95" x2="120" y2="95" stroke="rgba(255,255,255,0.25)" stroke-width="3"/>
-                    <circle cx="72" cy="42" r="10"/>
-                    <line x1="72" y1="52" x2="72" y2="88"/>
-                    <line x1="72" y1="88" x2="55" y2="120"/>
-                    <line x1="72" y1="88" x2="90" y2="120"/>
-                    <line x1="72" y1="68" x2="88" y2="62"/>
-                    <line x1="72" y1="68" x2="56" y2="62"/>
-                    <circle cx="80" cy="22" r="10" stroke="#e94560"/>
-                    <line x1="80" y1="32" x2="78" y2="68" stroke="#e94560"/>
-                    <line x1="78" y1="68" x2="58" y2="82" stroke="#e94560"/>
-                    <line x1="78" y1="68" x2="98" y2="82" stroke="#e94560"/>
-                    <line x1="79" y1="48" x2="62" y2="42" stroke="#e94560"/>
-                    <line x1="79" y1="48" x2="98" y2="42" stroke="#e94560"/>
-                </svg>`
+                img: "ic_afternoon_delight.png"
+            },
+            {
+                name: "Le gros plan",
+                desc: "Allongés face à face, très serrés, jambes entrelacées. Maximum de contact et d'intimité.",
+                difficulty: "facile",
+                img: "ic_close_up.png"
+            },
+            {
+                name: "L'agenouillée",
+                desc: "Elle est à genoux, penchée en avant. Il se place derrière, également à genoux. Classique et confortable.",
+                difficulty: "facile",
+                img: "ic_kneel.png"
+            },
+            {
+                name: "La pause zen",
+                desc: "Position relaxante, allongés sans effort. On se laisse porter par le moment, sans pression.",
+                difficulty: "facile",
+                img: "ic_zen_pause.png"
+            },
+            {
+                name: "Le chien",
+                desc: "Variante de la levrette, elle est plus basse, presque à plat. Angle de pénétration différent.",
+                difficulty: "facile",
+                img: "ic_hound.png"
+            },
+
+            // ===== MOYEN =====
+            {
+                name: "Amazone inversée",
+                desc: "Elle le chevauche en lui tournant le dos. Vue imprenable et sensations différentes pour les deux.",
+                difficulty: "moyen",
+                img: "ic_reverse_cowgirl.png"
+            },
+            {
+                name: "Lotus",
+                desc: "Il est assis en tailleur, elle sur ses cuisses face à lui, jambes autour de sa taille. Ultra intime.",
+                difficulty: "moyen",
+                img: "ic_lotus_blossom.png"
+            },
+            {
+                name: "Les ciseaux",
+                desc: "Jambes entrelacées comme des ciseaux, les deux partenaires semi-allongés. Rythme langoureux.",
+                difficulty: "moyen",
+                img: "ic_crisscross.png"
+            },
+            {
+                name: "La grenouille",
+                desc: "Elle s'accroupit sur lui, pieds à plat. Mouvements de rebond, elle contrôle l'amplitude.",
+                difficulty: "moyen",
+                img: "ic_frog.png"
+            },
+            {
+                name: "Par derrière debout",
+                desc: "Tous les deux debout, il la pénètre par derrière. Spontané et passionné.",
+                difficulty: "moyen",
+                img: "ic_from_behind.png"
+            },
+            {
+                name: "La jambe en l'air",
+                desc: "Debout face à face, elle lève une jambe qu'il soutient. Passion et équilibre.",
+                difficulty: "moyen",
+                img: "ic_lustful_leg.png"
+            },
+            {
+                name: "Le cadenas",
+                desc: "Debout, elle enroule une jambe autour de lui. Très passionné, contre un mur de préférence.",
+                difficulty: "moyen",
+                img: "ic_padlock.png"
+            },
+            {
+                name: "L'angle droit",
+                desc: "Elle est au bord d'une surface, lui debout. Les corps forment un angle droit. Pénétration profonde.",
+                difficulty: "moyen",
+                img: "ic_right_angle.png"
+            },
+            {
+                name: "La glissade inversée",
+                desc: "Elle est assise sur lui, penchée en arrière, les mains en appui. Vue et sensations intenses.",
+                difficulty: "moyen",
+                img: "ic_backward_slide.png"
+            },
+            {
+                name: "L'enclume",
+                desc: "Elle est sur le dos, jambes repliées sur sa poitrine. Il s'appuie au-dessus. Pénétration très profonde.",
+                difficulty: "moyen",
+                img: "ic_fold.png"
+            },
+            {
+                name: "La cavalière",
+                desc: "Elle chevauche de façon dynamique, penchée en avant, mains sur ses épaules. Rythme soutenu.",
+                difficulty: "moyen",
+                img: "ic_rider.png"
+            },
+            {
+                name: "La cascade",
+                desc: "Il est assis sur une chaise, elle sur lui, penchée en arrière tête renversée.",
+                difficulty: "moyen",
+                img: "ic_waterfall.png"
+            },
+            {
+                name: "L'amazone de côté",
+                desc: "Elle est assise sur lui de côté, jambes sur le côté. Original et sensations nouvelles.",
+                difficulty: "moyen",
+                img: "ic_side_saddle.png"
+            },
+            {
+                name: "La sirène",
+                desc: "Elle est au bord du lit, une jambe levée haut. Il se tient debout et guide le mouvement.",
+                difficulty: "moyen",
+                img: "ic_mermaid.png"
+            },
+            {
+                name: "Le sphinx",
+                desc: "Elle est à quatre pattes, bras tendus comme un sphinx. Il se place derrière.",
+                difficulty: "moyen",
+                img: "ic_sphinx.png"
+            },
+            {
+                name: "Le perchoir",
+                desc: "Il est assis sur une chaise, elle s'assied sur ses genoux face à lui ou de dos.",
+                difficulty: "moyen",
+                img: "ic_perch.png"
+            },
+            {
+                name: "La balançoire",
+                desc: "Il est assis, elle sur ses genoux dos à lui, se balance d'avant en arrière.",
+                difficulty: "moyen",
+                img: "ic_lap_top.png"
+            },
+            {
+                name: "Le visiteur",
+                desc: "Debout, il la prend par derrière en l'enlaçant. Étreinte passionnée et dominante.",
+                difficulty: "moyen",
+                img: "ic_visitor.png"
+            },
+            {
+                name: "La bandoulière",
+                desc: "Assis face à face, jambes par-dessus les siennes. Les bras se croisent pour se tenir. Très connectés.",
+                difficulty: "moyen",
+                img: "ic_bandoleer.png"
+            },
+            {
+                name: "Le panier",
+                desc: "Elle est assise sur lui, jambes croisées derrière son dos. Il la soutient. Fusion totale.",
+                difficulty: "moyen",
+                img: "ic_basket.png"
+            },
+            {
+                name: "Les clés croisées",
+                desc: "Elle est au bord, jambes levées et croisées. Il se tient debout. Angle original et serré.",
+                difficulty: "moyen",
+                img: "ic_crossed_keys.png"
+            },
+            {
+                name: "Le tigre accroupi",
+                desc: "Elle s'accroupit sur lui, pieds à plat, penchée en avant. Dynamique et contrôle total pour elle.",
+                difficulty: "moyen",
+                img: "ic_crouching_tiger.png"
+            },
+            {
+                name: "Le V érotique",
+                desc: "Elle est sur le dos, jambes levées en V. Il se positionne entre ses jambes. Pénétration profonde.",
+                difficulty: "moyen",
+                img: "ic_erotic_v.png"
+            },
+            {
+                name: "La galère",
+                desc: "Il est assis, elle se met à quatre pattes au-dessus de lui, dos à lui. Position originale et intense.",
+                difficulty: "moyen",
+                img: "ic_galley.png"
+            },
+            {
+                name: "Le triangle",
+                desc: "Variante du missionnaire où les corps forment un triangle. Elle relève le bassin pour plus de profondeur.",
+                difficulty: "moyen",
+                img: "ic_glowing_triangle.png"
+            },
+            {
+                name: "Le héros",
+                desc: "Il est à genoux, elle pose une jambe sur son épaule. Sensation d'étirement et profondeur.",
+                difficulty: "moyen",
+                img: "ic_hero.png"
+            },
+            {
+                name: "La montagne magique",
+                desc: "À genoux l'un derrière l'autre, étreinte enveloppante. Intime et rythmé.",
+                difficulty: "moyen",
+                img: "ic_magic_mountain.png"
+            },
+            {
+                name: "L'escargot",
+                desc: "Elle est sur le dos, jambes très repliées vers elle. Il s'appuie au-dessus, lentement.",
+                difficulty: "moyen",
+                img: "ic_snail.png"
+            },
+            {
+                name: "L'accroupie",
+                desc: "Elle s'accroupit au-dessus de lui, en équilibre. Intense pour les cuisses mais sensations fortes.",
+                difficulty: "moyen",
+                img: "ic_squat_balance.png"
+            },
+            {
+                name: "La croix",
+                desc: "Allongés perpendiculairement, corps en croix. Pénétration latérale, mains libres pour caresser.",
+                difficulty: "moyen",
+                img: "ic_cross.png"
+            },
+            {
+                name: "Le crapaud",
+                desc: "Elle est accroupie basse, presque assise. Il est derrière, également accroupi. Profond et compact.",
+                difficulty: "moyen",
+                img: "ic_toad.png"
+            },
+            {
+                name: "Le piquet",
+                desc: "Elle est assise sur lui, une jambe tendue, l'autre repliée. Angle asymétrique et stimulant.",
+                difficulty: "moyen",
+                img: "ic_peg.png"
+            },
+            {
+                name: "Le navire",
+                desc: "Elle est allongée, jambes sur ses épaules. Il est à genoux. Pénétration contrôlée et profonde.",
+                difficulty: "moyen",
+                img: "ic_ship.png"
+            },
+            {
+                name: "L'agrafe",
+                desc: "Allongés sur le côté, face à face, jambes entrelacées. Serrés, lents, connectés.",
+                difficulty: "moyen",
+                img: "ic_clip.png"
+            },
+            {
+                name: "Le chuchotement",
+                desc: "Elle est sur le dos, lui à côté, penchée vers elle. Intimitié maximale, on se parle à l'oreille.",
+                difficulty: "moyen",
+                img: "ic_wisper.png"
+            },
+            {
+                name: "La pieuvre",
+                desc: "Assis face à face, jambes entrelacées des deux côtés. Comme un puzzle humain.",
+                difficulty: "moyen",
+                img: "ic_spider.png"
+            },
+            {
+                name: "Le Tominagi",
+                desc: "Position japonaise traditionnelle. Il est assis, elle sur lui face à face, rythme lent et profond.",
+                difficulty: "moyen",
+                img: "ic_tominagi.png"
+            },
+            {
+                name: "La boule assise",
+                desc: "Les deux assis, elle sur ses genoux, recroquevillés l'un sur l'autre en boule. Très enveloppant.",
+                difficulty: "moyen",
+                img: "ic_seated_ball.png"
+            },
+            {
+                name: "L'ange enroulé",
+                desc: "Elle est sur le côté, recroquevillée. Il l'enveloppe par derrière, comme un ange protecteur.",
+                difficulty: "moyen",
+                img: "ic_curled_angel.png"
+            },
+            {
+                name: "Le genévrier ardent",
+                desc: "Elle est sur le dos, une jambe repliée, l'autre tendue. Il la pénètre en se penchant sur elle.",
+                difficulty: "moyen",
+                img: "ic_glowing_juniper.png"
+            },
+            {
+                name: "La Super 8",
+                desc: "Elle le chevauche en décrivant des mouvements en 8 avec ses hanches. Rythme envoûtant.",
+                difficulty: "moyen",
+                img: "ic_super_8.png"
+            },
+            {
+                name: "Le lotus allongé",
+                desc: "Variante du lotus en position allongée. Les jambes restent croisées, plus détendu mais toujours intime.",
+                difficulty: "moyen",
+                img: "ic_reclining_lotus.png"
+            },
+            {
+                name: "Grande ouverte",
+                desc: "Elle est sur le dos, jambes grandes ouvertes tenues par les mains. Accessibilité totale.",
+                difficulty: "moyen",
+                img: "ic_wide_opened.png"
+            },
+            {
+                name: "Le bateau à rames",
+                desc: "Assis face à face, jambes tendues de chaque côté, ils se tiennent les mains et se balancent.",
+                difficulty: "moyen",
+                img: "ic_rowing_boat.png"
+            },
+            {
+                name: "Le glissement",
+                desc: "Elle glisse progressivement vers l'avant pendant qu'il la suit. Mouvement fluide et continu.",
+                difficulty: "moyen",
+                img: "ic_landslide.png"
+            },
+            {
+                name: "La samba latérale",
+                desc: "Allongés sur le côté, elle lève une jambe. Pénétration latérale avec liberté de mouvement.",
+                difficulty: "moyen",
+                img: "ic_sideways_samba.png"
+            },
+            {
+                name: "L'acolyte",
+                desc: "Elle est assise sur lui de côté, il la soutient. Position asymétrique et originale.",
+                difficulty: "moyen",
+                img: "ic_sidekick.png"
+            },
+            {
+                name: "Le maître des cuisses",
+                desc: "Elle serre ses cuisses autour de lui pour augmenter la friction. Intense et contrôlé.",
+                difficulty: "moyen",
+                img: "ic_thigh_master.png"
+            },
+            {
+                name: "L'escalier",
+                desc: "Sur les marches d'un escalier ou en gradins. Les niveaux différents créent des angles uniques.",
+                difficulty: "moyen",
+                img: "ic_stair_master.png"
+            },
+            {
+                name: "La demande",
+                desc: "Il est à genoux comme pour une demande en mariage, elle devant lui. Galant et passionné.",
+                difficulty: "moyen",
+                img: "ic_proposal.png"
+            },
+            {
+                name: "La charnière",
+                desc: "Il est à genoux, penché en arrière comme une charnière. Elle le chevauche. Étirement et profondeur.",
+                difficulty: "moyen",
+                img: "ic_hinge.png"
+            },
+            {
+                name: "La prise",
+                desc: "Elle le tient fermement avec ses jambes, il ne peut pas bouger. Elle contrôle tout.",
+                difficulty: "moyen",
+                img: "ic_grip.png"
+            },
+            {
+                name: "Le slip",
+                desc: "Variante de la levrette, elle est plus basse et plus cambrée. Angle accentué.",
+                difficulty: "moyen",
+                img: "ic_slip.png"
+            },
+
+            // ===== AVANCÉ =====
+            {
+                name: "Brouette",
+                desc: "Il la tient par les hanches, elle marche sur les mains. Demande force et équilibre.",
+                difficulty: "avance",
+                img: "ic_standing_wheelbarrow.png"
+            },
+            {
+                name: "Le pont",
+                desc: "Il fait le pont (dos cambré, mains et pieds au sol), elle s'installe au-dessus. Acrobatique.",
+                difficulty: "avance",
+                img: "ic_bridge.png"
+            },
+            {
+                name: "L'hélice",
+                desc: "Elle tourne sur lui à 360° sans se déconnecter. Prouesse technique, sensations rotatives.",
+                difficulty: "avance",
+                img: "ic_propeller.png"
+            },
+            {
+                name: "Le congrès suspendu",
+                desc: "Il la porte, elle s'accroche à lui jambes autour de la taille. Demande beaucoup de force.",
+                difficulty: "avance",
+                img: "ic_suspended_congress.png"
+            },
+            {
+                name: "Le porte-épaules",
+                desc: "Les jambes d'elle reposent sur ses épaules à lui. Pénétration très profonde, demande souplesse.",
+                difficulty: "avance",
+                img: "ic_shoulder_holder.png"
+            },
+            {
+                name: "La roue de Catherine",
+                desc: "Assis dos à dos, jambes croisées entre eux. Rotation lente, connexion inhabituelle.",
+                difficulty: "avance",
+                img: "ic_catherine_wheel.png"
+            },
+            {
+                name: "Le double pont",
+                desc: "Les deux font le pont simultanément, superposés. Extrêmement acrobatique.",
+                difficulty: "avance",
+                img: "ic_double_decker.png"
+            },
+            {
+                name: "L'Indrani",
+                desc: "Elle ramène ses genoux jusqu'aux oreilles. Position du Kama Sutra qui demande une grande souplesse.",
+                difficulty: "avance",
+                img: "ic_indrani.png"
+            },
+            {
+                name: "Le rock'n'roll",
+                desc: "Elle est sur le dos, jambes en l'air repliées. Il est à genoux et imprime un rythme rock. Intense.",
+                difficulty: "avance",
+                img: "ic_rock_n_roller.png"
+            },
+            {
+                name: "Le bambou fendu",
+                desc: "Elle lève une jambe très haut, posée sur son épaule. L'autre reste au sol. Grand écart partiel requis.",
+                difficulty: "avance",
+                img: "ic_splitting_bamboo.png"
+            },
+            {
+                name: "La chandelle",
+                desc: "Elle monte les jambes à la verticale, soutenue par ses mains. Il s'adapte à l'angle. Gymnique.",
+                difficulty: "avance",
+                img: "ic_candle.png"
+            },
+            {
+                name: "La charrue",
+                desc: "Elle est sur le dos, jambes ramenées au-dessus de sa tête comme en yoga. Très profond et intense.",
+                difficulty: "avance",
+                img: "ic_plough.png"
+            },
+            {
+                name: "L'équilibriste",
+                desc: "Elle est en appui sur un pied, l'autre en l'air, il la soutient. Équilibre précaire mais excitant.",
+                difficulty: "avance",
+                img: "ic_balancing_act.png"
+            },
+            {
+                name: "Le défi",
+                desc: "Position complexe nécessitant force et souplesse des deux partenaires. Pour les aventuriers.",
+                difficulty: "avance",
+                img: "ic_challenge.png"
+            },
+            {
+                name: "La brouette à genoux",
+                desc: "Comme la brouette mais il est à genoux. Un peu plus stable, toujours aussi sportif.",
+                difficulty: "avance",
+                img: "ic_knelling_wheelbarrow.png"
+            },
+            {
+                name: "Le singe",
+                desc: "Elle s'accroche à lui comme un singe à un arbre. Il est debout, elle suspendue. Force brute requise.",
+                difficulty: "avance",
+                img: "ic_ape.png"
+            },
+            {
+                name: "L'arc de triomphe",
+                desc: "Il est debout, cambré en arrière formant un arc. Elle s'adapte dessous. Spectaculaire.",
+                difficulty: "avance",
+                img: "ic_triumph_arch.png"
+            },
+            {
+                name: "L'appui-épaules",
+                desc: "Elle fait l'appui sur les épaules (chandelle yoga), il se positionne au-dessus. Très acrobatique.",
+                difficulty: "avance",
+                img: "ic_shoulder_stand.png"
+            },
+            {
+                name: "La supernova",
+                desc: "Position explosive où les deux partenaires sont imbriqués de façon complexe. Coordination parfaite requise.",
+                difficulty: "avance",
+                img: "ic_supernova.png"
+            },
+            {
+                name: "La courbe en Y",
+                desc: "Les corps forment un Y. Elle lève une jambe à la verticale pendant la pénétration. Souplesse extrême.",
+                difficulty: "avance",
+                img: "ic_y_curve.png"
+            },
+            {
+                name: "La force G",
+                desc: "Position intense où la gravité joue un rôle central. Elle est presque inversée, il la maintient.",
+                difficulty: "avance",
+                img: "ic_g_force.png"
+            },
+            {
+                name: "Le poirier indien",
+                desc: "Elle fait le poirier, il la soutient. Position renversée du Kama Sutra. Pour experts uniquement.",
+                difficulty: "avance",
+                img: "ic_indian_handstand.png"
+            },
+            {
+                name: "Les ciseaux suspendus",
+                desc: "Comme les ciseaux mais avec un partenaire partiellement suspendu. Équilibre et force nécessaires.",
+                difficulty: "avance",
+                img: "ic_suspended_scissors.png"
+            },
+            {
+                name: "Le mur",
+                desc: "Contre un mur, elle est soulevée et plaquée. Requiert force et un bon mur solide.",
+                difficulty: "avance",
+                img: "ic_wall.png"
             }
         ];
 
-        const IMG_BASE = 'https://raw.githubusercontent.com/vise950/Libido/master/assets/images/';
-        const IMG_MAP = {
-            'Missionnaire': 'ic_classic.png',
-            'Levrette': 'ic_doggy_style.png',
-            'Amazone': 'ic_amazon.png',
-            'Amazone inversée': 'ic_reverse_cowgirl.png',
-            'Cuillère': 'ic_slide.png',
-            'Lotus': 'ic_lotus_blossom.png',
-            'Andromaque': 'ic_rocking_horse.png',
-
-            'Brouette': 'ic_standing_wheelbarrow.png',
-            "L'union du loup": 'ic_lustful_leg.png',
-            'Le pont': 'ic_bridge.png',
-            'La balançoire': 'ic_lap_top.png',
-            "L'étoile de mer": 'ic_star.png',
-            'Debout face à face': 'ic_from_behind.png',
-            'La chaise longue': 'ic_deckchair.png',
-            'Le berceau': 'ic_seduction.png',
-            'La grenouille': 'ic_frog.png',
-            'Le ciseaux': 'ic_crisscross.png',
-            'La pieuvre': 'ic_spider.png',
-            'Le porteur': 'ic_suspended_congress.png',
-            "L'équerre": 'ic_right_angle.png',
-            'La chaise': 'ic_backward_slide.png',
-            "L'arbre à souhaits": 'ic_padlock.png',
-            'La danse du loup': 'ic_visitor.png',
-            'Le papillon': 'ic_butterfly.png',
-            'La planche': 'ic_nirvana.png',
-            'Le toboggan': 'ic_prone_tiger.png',
-            'Le pilier': 'ic_kneel.png',
-            'La cascade': 'ic_waterfall.png',
-            'Le trône': 'ic_perch.png',
-            'La brouette japonaise': 'ic_sphinx.png',
-            'Le vautour': 'ic_squat_balance.png',
-            'Le rodéo': 'ic_rider.png',
-            'Le dromadaire': 'ic_hound.png',
-            'La pirouette': 'ic_side_saddle.png',
-            "L'enclume": 'ic_fold.png',
-            'La toupie': 'ic_propeller.png',
-            'Le X': 'ic_x_rated.png',
-            'La catapulte': 'ic_shoulder_holder.png',
-            'La sirène': 'ic_mermaid.png',
-            "L'étreinte": 'ic_clasp.png',
-            'La bandoulière': 'ic_bandoleer.png',
-            'Le panier': 'ic_basket.png',
-            'La chandelle': 'ic_candle.png',
-            'La roue': 'ic_catherine_wheel.png',
-            'Les clés croisées': 'ic_crossed_keys.png',
-            'Le tigre accroupi': 'ic_crouching_tiger.png',
-            'Le dauphin': 'ic_dolphin.png',
-            'Le double pont': 'ic_double_decker.png',
-            'Le V érotique': 'ic_erotic_v.png',
-            "L'éventail": 'ic_fan.png',
-            'La galère': 'ic_galley.png',
-            'Le triangle': 'ic_glowing_triangle.png',
-            'Le héros': 'ic_hero.png',
-            "L'Indrani": 'ic_indrani.png',
-            'La montagne magique': 'ic_magic_mountain.png',
-            "Le rock'n'roll": 'ic_rock_n_roller.png',
-            "L'escargot": 'ic_snail.png',
-            'Le bambou fendu': 'ic_splitting_bamboo.png',
-            "L'après-midi câlin": 'ic_afternoon_delight.png'
-        };
-
         // Précharger les images
-        Object.values(IMG_MAP).forEach(f => { const i = new Image(); i.src = IMG_BASE + f; });
+        positions.forEach(p => {
+            if (p.img) {
+                const i = new Image();
+                i.src = IMG_BASE + p.img;
+            }
+        });
 
         let lastIndex = -1;
         let activeFilters = new Set(['facile', 'moyen', 'avance']);
-        let showingDetailed = false;
 
         function toggleFilter(el) {
             const level = el.dataset.level;
@@ -1850,14 +1100,11 @@
                 card.classList.add('fade-in');
             }
 
-            showingDetailed = false;
-            illustration.classList.remove('detailed');
-
-            const imgFile = IMG_MAP[pos.name];
-            const imgTag = imgFile
-                ? `<img class="real-img" src="${IMG_BASE}${imgFile}" alt="${pos.name}" loading="lazy"/>`
-                : '';
-            illustration.innerHTML = pos.svg + imgTag + '<span class="view-toggle-hint">voir +</span>';
+            if (pos.img) {
+                illustration.innerHTML = `<img src="${IMG_BASE}${pos.img}" alt="${pos.name}" loading="lazy"/>`;
+            } else if (pos.svg) {
+                illustration.innerHTML = pos.svg;
+            }
 
             name.textContent = pos.name;
             desc.textContent = pos.desc;
@@ -1880,26 +1127,6 @@
             showPosition(pos, true);
         }
 
-        function toggleView(e) {
-            e.stopPropagation();
-            if (lastIndex < 0) return;
-            const pos = positions[lastIndex];
-            const imgFile = IMG_MAP[pos.name];
-            if (!imgFile) return;
-
-            const illustration = document.getElementById('illustration');
-            showingDetailed = !showingDetailed;
-
-            if (showingDetailed) {
-                illustration.classList.add('detailed');
-                illustration.querySelector('.view-toggle-hint').textContent = '< stick';
-            } else {
-                illustration.classList.remove('detailed');
-                illustration.querySelector('.view-toggle-hint').textContent = 'voir +';
-            }
-        }
-
-        // Liste panel
         function buildList() {
             const body = document.getElementById('listBody');
             const groups = { facile: [], moyen: [], avance: [] };
@@ -1912,8 +1139,11 @@
                 html += `<div class="list-section">
                     <div class="list-section-title ${level}">${labels[level]} (${items.length})</div>`;
                 items.forEach(p => {
+                    const icon = p.img
+                        ? `<img src="${IMG_BASE}${p.img}" alt="${p.name}" loading="lazy"/>`
+                        : (p.svg || '');
                     html += `<div class="list-item" onclick="selectPosition(${p.idx})">
-                        <div class="list-item-icon">${p.svg}</div>
+                        <div class="list-item-icon">${icon}</div>
                         <div class="list-item-text">
                             <div class="list-item-name">${p.name}</div>
                             <div class="list-item-desc">${p.desc}</div>
@@ -1960,16 +1190,13 @@
             }
         });
 
-        // Swipe support (seulement en dehors de l'illustration)
+        // Swipe support
         let touchStartY = 0;
-        let touchStartedOnIllustration = false;
         const card = document.getElementById('card');
         card.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
-            touchStartedOnIllustration = e.target.closest('.illustration') !== null;
         }, { passive: true });
         card.addEventListener('touchend', (e) => {
-            if (touchStartedOnIllustration) return;
             const dy = touchStartY - e.changedTouches[0].clientY;
             if (Math.abs(dy) > 40) generate();
         }, { passive: true });
