@@ -70,11 +70,25 @@
             align-items: center;
             justify-content: center;
             border: 2px solid rgba(233, 69, 96, 0.3);
+            position: relative;
         }
 
         .illustration svg {
             width: 75%;
             height: 75%;
+        }
+
+        .illustration.detailed svg {
+            width: 82%;
+            height: 82%;
+        }
+
+        .view-toggle-hint {
+            position: absolute;
+            bottom: 6px;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.2);
+            pointer-events: none;
         }
 
         .position-name {
@@ -417,7 +431,9 @@
     </div>
 
     <div class="card" id="card" onclick="generate()">
-        <div class="illustration" id="illustration"></div>
+        <div class="illustration" id="illustration" onclick="toggleView(event)">
+            <span class="view-toggle-hint" id="viewToggleHint"></span>
+        </div>
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
@@ -1332,11 +1348,92 @@
 
         let lastIndex = -1;
         let activeFilters = new Set(['facile', 'moyen', 'avance']);
+        let showingDetailed = false;
+
+        // Transforme un SVG stick-figure en silhouette avec corps remplis
+        function createSilhouette(svgString) {
+            const div = document.createElement('div');
+            div.innerHTML = svgString;
+            const svg = div.querySelector('svg');
+
+            // Séparer les éléments par personnage (blanc vs rouge)
+            const whiteEls = [];
+            const redEls = [];
+            const otherEls = [];
+            svg.querySelectorAll('circle, line, path, ellipse, rect, polygon').forEach(el => {
+                const s = el.getAttribute('stroke') || '';
+                if (s === '#e94560') redEls.push(el);
+                else if (s.includes('rgba') || s === 'none') otherEls.push(el);
+                else whiteEls.push(el);
+            });
+
+            [whiteEls, redEls].forEach(group => {
+                const color = group === redEls ? '#e94560' : '#ffffff';
+                const colorDim = group === redEls ? 'rgba(233,69,96,0.25)' : 'rgba(255,255,255,0.18)';
+
+                // Trouver la tête (circle)
+                const head = group.find(el => el.tagName === 'circle');
+                if (!head) return;
+                const hx = +head.getAttribute('cx');
+                const hy = +head.getAttribute('cy');
+
+                // Remplir et agrandir la tête
+                head.setAttribute('fill', color);
+                head.setAttribute('r', '12');
+                head.setAttribute('stroke', 'none');
+
+                // Trouver le torse (1ère line/path partant de la tête)
+                const bodyEl = group.find(el => {
+                    if (el === head) return false;
+                    if (el.tagName === 'line') {
+                        const x1 = +el.getAttribute('x1'), y1 = +el.getAttribute('y1');
+                        return Math.abs(x1 - hx) < 20 && Math.abs(y1 - hy) < 20;
+                    }
+                    return false;
+                });
+
+                if (bodyEl && bodyEl.tagName === 'line') {
+                    const x1 = +bodyEl.getAttribute('x1'), y1 = +bodyEl.getAttribute('y1');
+                    const x2 = +bodyEl.getAttribute('x2'), y2 = +bodyEl.getAttribute('y2');
+                    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+                    const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+
+                    // Ellipse de torse
+                    const torso = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    torso.setAttribute('cx', mx);
+                    torso.setAttribute('cy', my);
+                    torso.setAttribute('rx', len / 2.2);
+                    torso.setAttribute('ry', '8');
+                    torso.setAttribute('fill', colorDim);
+                    torso.setAttribute('stroke', 'none');
+                    torso.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
+                    svg.insertBefore(torso, svg.firstChild);
+                }
+
+                // Épaissir tous les membres
+                group.forEach(el => {
+                    if (el === head) return;
+                    if (el.tagName === 'line' || el.tagName === 'path') {
+                        el.setAttribute('stroke-width', '6');
+                        el.setAttribute('stroke', color);
+                        el.setAttribute('opacity', '0.9');
+                    }
+                });
+            });
+
+            // Props (meubles etc.) restent fins
+            otherEls.forEach(el => {
+                if (el.tagName === 'polygon') return;
+                el.setAttribute('stroke-width', '2');
+            });
+
+            return div.innerHTML;
+        }
 
         function toggleFilter(el) {
             const level = el.dataset.level;
             if (activeFilters.has(level)) {
-                // Ne pas permettre de tout désactiver
                 if (activeFilters.size <= 1) return;
                 activeFilters.delete(level);
                 el.classList.remove('active');
@@ -1345,6 +1442,32 @@
                 el.classList.add('active');
             }
             generate();
+        }
+
+        function showPosition(pos, animate) {
+            const card = document.getElementById('card');
+            const illustration = document.getElementById('illustration');
+            const name = document.getElementById('positionName');
+            const desc = document.getElementById('positionDesc');
+            const diff = document.getElementById('difficulty');
+            const toggleHint = document.getElementById('viewToggleHint');
+
+            if (animate) {
+                card.classList.remove('fade-in');
+                void card.offsetWidth;
+                card.classList.add('fade-in');
+            }
+
+            // Toujours revenir à la vue stick par défaut
+            showingDetailed = false;
+            illustration.classList.remove('detailed');
+            illustration.innerHTML = pos.svg + '<span class="view-toggle-hint" id="viewToggleHint">voir +</span>';
+
+            name.textContent = pos.name;
+            desc.textContent = pos.desc;
+            diff.textContent = pos.difficulty === 'facile' ? 'Facile' :
+                              pos.difficulty === 'moyen' ? 'Moyen' : 'Avancé';
+            diff.className = 'difficulty ' + pos.difficulty;
         }
 
         function generate() {
@@ -1358,25 +1481,25 @@
 
             const pos = filtered[index];
             lastIndex = positions.indexOf(pos);
+            showPosition(pos, true);
+        }
 
-            const card = document.getElementById('card');
+        function toggleView(e) {
+            e.stopPropagation();
+            if (lastIndex < 0) return;
+            const pos = positions[lastIndex];
             const illustration = document.getElementById('illustration');
-            const name = document.getElementById('positionName');
-            const desc = document.getElementById('positionDesc');
-            const diff = document.getElementById('difficulty');
+            const toggleHint = illustration.querySelector('.view-toggle-hint');
 
-            // Animation
-            card.classList.remove('fade-in');
-            void card.offsetWidth; // force reflow
-            card.classList.add('fade-in');
-
-            illustration.innerHTML = pos.svg;
-            name.textContent = pos.name;
-            desc.textContent = pos.desc;
-
-            diff.textContent = pos.difficulty === 'facile' ? 'Facile' :
-                              pos.difficulty === 'moyen' ? 'Moyen' : 'Avancé';
-            diff.className = 'difficulty ' + pos.difficulty;
+            if (!showingDetailed) {
+                illustration.innerHTML = createSilhouette(pos.svg) + '<span class="view-toggle-hint">stick</span>';
+                illustration.classList.add('detailed');
+                showingDetailed = true;
+            } else {
+                illustration.innerHTML = pos.svg + '<span class="view-toggle-hint" id="viewToggleHint">voir +</span>';
+                illustration.classList.remove('detailed');
+                showingDetailed = false;
+            }
         }
 
         // Liste panel
@@ -1407,23 +1530,7 @@
 
         function selectPosition(idx) {
             lastIndex = idx;
-            const pos = positions[idx];
-            const card = document.getElementById('card');
-            const illustration = document.getElementById('illustration');
-            const name = document.getElementById('positionName');
-            const desc = document.getElementById('positionDesc');
-            const diff = document.getElementById('difficulty');
-
-            card.classList.remove('fade-in');
-            void card.offsetWidth;
-            card.classList.add('fade-in');
-
-            illustration.innerHTML = pos.svg;
-            name.textContent = pos.name;
-            desc.textContent = pos.desc;
-            diff.textContent = pos.difficulty === 'facile' ? 'Facile' :
-                              pos.difficulty === 'moyen' ? 'Moyen' : 'Avancé';
-            diff.className = 'difficulty ' + pos.difficulty;
+            showPosition(positions[idx], true);
             closeList();
         }
 
@@ -1456,13 +1563,16 @@
             }
         });
 
-        // Swipe support
+        // Swipe support (seulement en dehors de l'illustration)
         let touchStartY = 0;
+        let touchStartedOnIllustration = false;
         const card = document.getElementById('card');
         card.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
+            touchStartedOnIllustration = e.target.closest('.illustration') !== null;
         }, { passive: true });
         card.addEventListener('touchend', (e) => {
+            if (touchStartedOnIllustration) return;
             const dy = touchStartY - e.changedTouches[0].clientY;
             if (Math.abs(dy) > 40) generate();
         }, { passive: true });
