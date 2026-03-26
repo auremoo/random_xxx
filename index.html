@@ -14,19 +14,19 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
             padding: 20px;
-            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         h1 {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+            margin-bottom: 20px;
             text-align: center;
             background: linear-gradient(90deg, #e94560, #ff6b6b);
             -webkit-background-clip: text;
@@ -40,23 +40,30 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
-            padding: 40px;
+            padding: clamp(20px, 5vw, 40px);
             max-width: 420px;
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
-        .card:hover {
-            transform: translateY(-2px);
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        @media (hover: hover) {
+            .card:hover {
+                transform: translateY(-2px);
+            }
         }
 
         .illustration {
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 24px;
+            width: clamp(150px, 50vw, 220px);
+            height: clamp(150px, 50vw, 220px);
+            margin: 0 auto 20px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 50%;
             display: flex;
@@ -66,22 +73,22 @@
         }
 
         .illustration svg {
-            width: 160px;
-            height: 160px;
+            width: 75%;
+            height: 75%;
         }
 
         .position-name {
-            font-size: 1.6rem;
+            font-size: clamp(1.2rem, 4.5vw, 1.6rem);
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: #ff6b6b;
         }
 
         .position-desc {
-            font-size: 0.95rem;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
             line-height: 1.6;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .filters {
@@ -93,9 +100,9 @@
         }
 
         .filter-chip {
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: clamp(0.8rem, 3vw, 0.85rem);
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -103,11 +110,19 @@
             background: rgba(255, 255, 255, 0.05);
             color: rgba(255, 255, 255, 0.5);
             user-select: none;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .filter-chip:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.7);
+        .filter-chip:active {
+            transform: scale(0.95);
+        }
+
+        @media (hover: hover) {
+            .filter-chip:hover {
+                border-color: rgba(255, 255, 255, 0.3);
+                color: rgba(255, 255, 255, 0.7);
+            }
         }
 
         .filter-chip.active.facile {
@@ -131,7 +146,7 @@
         .hint {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.25);
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         /* Animation d'entrée */
@@ -178,32 +193,40 @@
         }
 
         footer {
-            margin-top: 30px;
+            margin-top: 20px;
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.3);
+            padding-bottom: env(safe-area-inset-bottom, 10px);
         }
 
-        @media (max-width: 480px) {
-            .card {
-                padding: 28px 20px;
+        @media (max-width: 380px) {
+            body {
+                padding: 12px;
             }
 
+            .filters {
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+        }
+
+        @media (max-height: 700px) {
             h1 {
-                font-size: 1.4rem;
+                margin-bottom: 12px;
             }
 
             .illustration {
-                width: 180px;
-                height: 180px;
-            }
-
-            .illustration svg {
                 width: 130px;
                 height: 130px;
+                margin-bottom: 14px;
             }
 
-            .position-name {
-                font-size: 1.3rem;
+            .position-desc {
+                margin-bottom: 12px;
+            }
+
+            footer {
+                margin-top: 12px;
             }
         }
     </style>
@@ -223,7 +246,7 @@
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
-        <div class="hint">Clique ou appuie sur Espace</div>
+        <div class="hint" id="hint">Touche pour générer</div>
     </div>
 
     <footer>Have fun !</footer>
@@ -1168,6 +1191,11 @@
             diff.className = 'difficulty ' + pos.difficulty;
         }
 
+        // Hint adaptatif
+        const hint = document.getElementById('hint');
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        hint.textContent = isTouchDevice ? 'Touche pour générer' : 'Clique ou appuie sur Espace';
+
         // Générer au chargement
         generate();
 
@@ -1178,6 +1206,17 @@
                 generate();
             }
         });
+
+        // Swipe support
+        let touchStartY = 0;
+        const card = document.getElementById('card');
+        card.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        card.addEventListener('touchend', (e) => {
+            const dy = touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 40) generate();
+        }, { passive: true });
     </script>
 </body>
 </html>
