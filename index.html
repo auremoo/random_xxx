@@ -79,8 +79,19 @@
         }
 
         .illustration.detailed svg {
-            width: 82%;
-            height: 82%;
+            display: none;
+        }
+
+        .illustration img.real-img {
+            display: none;
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(233, 69, 96, 0.3));
+        }
+
+        .illustration.detailed img.real-img {
+            display: block;
         }
 
         .view-toggle-hint {
@@ -89,6 +100,7 @@
             font-size: 0.6rem;
             color: rgba(255, 255, 255, 0.2);
             pointer-events: none;
+            transition: opacity 0.2s;
         }
 
         .position-name {
@@ -1346,90 +1358,56 @@
             }
         ];
 
+        const IMG_BASE = 'https://raw.githubusercontent.com/vise950/Libido/master/assets/images/';
+        const IMG_MAP = {
+            'Missionnaire': 'ic_classic.png',
+            'Levrette': 'ic_doggy_style.png',
+            'Amazone': 'ic_amazon.png',
+            'Amazone inversée': 'ic_reverse_cowgirl.png',
+            'Cuillère': 'ic_slip.png',
+            'Lotus': 'ic_lotus_blossom.png',
+            'Andromaque': 'ic_rocking_horse.png',
+            '69': 'ic_super_8.png',
+            'Brouette': 'ic_standing_wheelbarrow.png',
+            "L'union du loup": 'ic_lustful_leg.png',
+            'Le pont': 'ic_bridge.png',
+            'La balançoire': 'ic_lap_top.png',
+            "L'étoile de mer": 'ic_star.png',
+            'Debout face à face': 'ic_balancing_act.png',
+            'La chaise longue': 'ic_deckchair.png',
+            'Le berceau': 'ic_seduction.png',
+            'La grenouille': 'ic_frog.png',
+            'Le ciseaux': 'ic_crisscross.png',
+            'La pieuvre': 'ic_spider.png',
+            'Le porteur': 'ic_suspended_congress.png',
+            "L'équerre": 'ic_right_angle.png',
+            'La chaise': 'ic_backward_slide.png',
+            "L'arbre à souhaits": 'ic_padlock.png',
+            'La danse du loup': 'ic_from_behind.png',
+            'Le papillon': 'ic_butterfly.png',
+            'La planche': 'ic_nirvana.png',
+            'Le toboggan': 'ic_prone_tiger.png',
+            'Le pilier': 'ic_kneel.png',
+            'La cascade': 'ic_waterfall.png',
+            'Le trône': 'ic_close_up.png',
+            'La brouette japonaise': 'ic_sphinx.png',
+            'Le vautour': 'ic_squat_balance.png',
+            'Le rodéo': 'ic_rider.png',
+            'Le dromadaire': 'ic_hound.png',
+            'La pirouette': 'ic_side_saddle.png',
+            "L'enclume": 'ic_fold.png',
+            'La toupie': 'ic_propeller.png',
+            'Le X': 'ic_x_rated.png',
+            'La catapulte': 'ic_shoulder_holder.png',
+            'La sirène': 'ic_mermaid.png'
+        };
+
+        // Précharger les images
+        Object.values(IMG_MAP).forEach(f => { const i = new Image(); i.src = IMG_BASE + f; });
+
         let lastIndex = -1;
         let activeFilters = new Set(['facile', 'moyen', 'avance']);
         let showingDetailed = false;
-
-        // Transforme un SVG stick-figure en silhouette avec corps remplis
-        function createSilhouette(svgString) {
-            const div = document.createElement('div');
-            div.innerHTML = svgString;
-            const svg = div.querySelector('svg');
-
-            // Séparer les éléments par personnage (blanc vs rouge)
-            const whiteEls = [];
-            const redEls = [];
-            const otherEls = [];
-            svg.querySelectorAll('circle, line, path, ellipse, rect, polygon').forEach(el => {
-                const s = el.getAttribute('stroke') || '';
-                if (s === '#e94560') redEls.push(el);
-                else if (s.includes('rgba') || s === 'none') otherEls.push(el);
-                else whiteEls.push(el);
-            });
-
-            [whiteEls, redEls].forEach(group => {
-                const color = group === redEls ? '#e94560' : '#ffffff';
-                const colorDim = group === redEls ? 'rgba(233,69,96,0.25)' : 'rgba(255,255,255,0.18)';
-
-                // Trouver la tête (circle)
-                const head = group.find(el => el.tagName === 'circle');
-                if (!head) return;
-                const hx = +head.getAttribute('cx');
-                const hy = +head.getAttribute('cy');
-
-                // Remplir et agrandir la tête
-                head.setAttribute('fill', color);
-                head.setAttribute('r', '12');
-                head.setAttribute('stroke', 'none');
-
-                // Trouver le torse (1ère line/path partant de la tête)
-                const bodyEl = group.find(el => {
-                    if (el === head) return false;
-                    if (el.tagName === 'line') {
-                        const x1 = +el.getAttribute('x1'), y1 = +el.getAttribute('y1');
-                        return Math.abs(x1 - hx) < 20 && Math.abs(y1 - hy) < 20;
-                    }
-                    return false;
-                });
-
-                if (bodyEl && bodyEl.tagName === 'line') {
-                    const x1 = +bodyEl.getAttribute('x1'), y1 = +bodyEl.getAttribute('y1');
-                    const x2 = +bodyEl.getAttribute('x2'), y2 = +bodyEl.getAttribute('y2');
-                    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-                    const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
-                    const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
-
-                    // Ellipse de torse
-                    const torso = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-                    torso.setAttribute('cx', mx);
-                    torso.setAttribute('cy', my);
-                    torso.setAttribute('rx', len / 2.2);
-                    torso.setAttribute('ry', '8');
-                    torso.setAttribute('fill', colorDim);
-                    torso.setAttribute('stroke', 'none');
-                    torso.setAttribute('transform', `rotate(${angle} ${mx} ${my})`);
-                    svg.insertBefore(torso, svg.firstChild);
-                }
-
-                // Épaissir tous les membres
-                group.forEach(el => {
-                    if (el === head) return;
-                    if (el.tagName === 'line' || el.tagName === 'path') {
-                        el.setAttribute('stroke-width', '6');
-                        el.setAttribute('stroke', color);
-                        el.setAttribute('opacity', '0.9');
-                    }
-                });
-            });
-
-            // Props (meubles etc.) restent fins
-            otherEls.forEach(el => {
-                if (el.tagName === 'polygon') return;
-                el.setAttribute('stroke-width', '2');
-            });
-
-            return div.innerHTML;
-        }
 
         function toggleFilter(el) {
             const level = el.dataset.level;
@@ -1450,7 +1428,6 @@
             const name = document.getElementById('positionName');
             const desc = document.getElementById('positionDesc');
             const diff = document.getElementById('difficulty');
-            const toggleHint = document.getElementById('viewToggleHint');
 
             if (animate) {
                 card.classList.remove('fade-in');
@@ -1458,10 +1435,14 @@
                 card.classList.add('fade-in');
             }
 
-            // Toujours revenir à la vue stick par défaut
             showingDetailed = false;
             illustration.classList.remove('detailed');
-            illustration.innerHTML = pos.svg + '<span class="view-toggle-hint" id="viewToggleHint">voir +</span>';
+
+            const imgFile = IMG_MAP[pos.name];
+            const imgTag = imgFile
+                ? `<img class="real-img" src="${IMG_BASE}${imgFile}" alt="${pos.name}" loading="lazy"/>`
+                : '';
+            illustration.innerHTML = pos.svg + imgTag + '<span class="view-toggle-hint">voir +</span>';
 
             name.textContent = pos.name;
             desc.textContent = pos.desc;
@@ -1488,17 +1469,18 @@
             e.stopPropagation();
             if (lastIndex < 0) return;
             const pos = positions[lastIndex];
-            const illustration = document.getElementById('illustration');
-            const toggleHint = illustration.querySelector('.view-toggle-hint');
+            const imgFile = IMG_MAP[pos.name];
+            if (!imgFile) return;
 
-            if (!showingDetailed) {
-                illustration.innerHTML = createSilhouette(pos.svg) + '<span class="view-toggle-hint">stick</span>';
+            const illustration = document.getElementById('illustration');
+            showingDetailed = !showingDetailed;
+
+            if (showingDetailed) {
                 illustration.classList.add('detailed');
-                showingDetailed = true;
+                illustration.querySelector('.view-toggle-hint').textContent = '< stick';
             } else {
-                illustration.innerHTML = pos.svg + '<span class="view-toggle-hint" id="viewToggleHint">voir +</span>';
                 illustration.classList.remove('detailed');
-                showingDetailed = false;
+                illustration.querySelector('.view-toggle-hint').textContent = 'voir +';
             }
         }
 
