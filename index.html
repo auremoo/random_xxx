@@ -46,6 +46,7 @@
             text-align: center;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         .card:hover {
@@ -83,33 +84,54 @@
             margin-bottom: 28px;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #e94560, #c23152);
-            color: #fff;
-            border: none;
-            padding: 14px 36px;
-            font-size: 1.05rem;
-            font-weight: 600;
+        .filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 8px 18px;
             border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            user-select: none;
         }
 
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 30px rgba(233, 69, 96, 0.6);
+        .filter-chip:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .btn:active {
-            transform: scale(0.97);
+        .filter-chip.active.facile {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border-color: rgba(46, 213, 115, 0.5);
         }
 
-        .dice {
-            display: inline-block;
-            margin-right: 8px;
-            font-size: 1.2rem;
+        .filter-chip.active.moyen {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+            border-color: rgba(255, 165, 2, 0.5);
+        }
+
+        .filter-chip.active.avance {
+            background: rgba(233, 69, 96, 0.2);
+            color: #e94560;
+            border-color: rgba(233, 69, 96, 0.5);
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 20px;
         }
 
         /* Animation d'entrée */
@@ -190,14 +212,18 @@
 
     <h1>Position Generator</h1>
 
-    <div class="card" id="card">
+    <div class="filters">
+        <div class="filter-chip active facile" data-level="facile" onclick="toggleFilter(this)">Facile</div>
+        <div class="filter-chip active moyen" data-level="moyen" onclick="toggleFilter(this)">Moyen</div>
+        <div class="filter-chip active avance" data-level="avance" onclick="toggleFilter(this)">Avancé</div>
+    </div>
+
+    <div class="card" id="card" onclick="generate()">
         <div class="illustration" id="illustration"></div>
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
-        <button class="btn" onclick="generate()">
-            <span class="dice">&#127922;</span> Nouvelle position
-        </button>
+        <div class="hint">Clique ou appuie sur Espace</div>
     </div>
 
     <footer>Have fun !</footer>
@@ -636,15 +662,34 @@
         ];
 
         let lastIndex = -1;
+        let activeFilters = new Set(['facile', 'moyen', 'avance']);
+
+        function toggleFilter(el) {
+            const level = el.dataset.level;
+            if (activeFilters.has(level)) {
+                // Ne pas permettre de tout désactiver
+                if (activeFilters.size <= 1) return;
+                activeFilters.delete(level);
+                el.classList.remove('active');
+            } else {
+                activeFilters.add(level);
+                el.classList.add('active');
+            }
+            generate();
+        }
 
         function generate() {
+            const filtered = positions.filter(p => activeFilters.has(p.difficulty));
+            if (filtered.length === 0) return;
+
             let index;
             do {
-                index = Math.floor(Math.random() * positions.length);
-            } while (index === lastIndex && positions.length > 1);
-            lastIndex = index;
+                index = Math.floor(Math.random() * filtered.length);
+            } while (filtered[index] === positions[lastIndex] && filtered.length > 1);
 
-            const pos = positions[index];
+            const pos = filtered[index];
+            lastIndex = positions.indexOf(pos);
+
             const card = document.getElementById('card');
             const illustration = document.getElementById('illustration');
             const name = document.getElementById('positionName');
