@@ -335,14 +335,45 @@
             padding: 12px 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             cursor: pointer;
-            touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             border-radius: 10px;
-            transition: background 0.15s;
+            transition: background 0.15s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
         }
 
         .list-item:active {
             background: rgba(255, 255, 255, 0.06);
+        }
+
+        .list-item-swipe-hint {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: rgba(233, 69, 96, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.2s;
+            pointer-events: none;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .list-item-swipe-hint svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .list-item.swiping .list-item-swipe-hint {
+            width: 60px;
+        }
+
+        .list-item.swiping .list-item-swipe-hint svg {
+            opacity: 1;
         }
 
         .list-item-icon {
@@ -580,9 +611,15 @@
             <h2>Toutes les positions</h2>
             <button class="list-panel-close" onclick="closeList()">&times;</button>
         </div>
-        <div class="fav-filter" id="favFilter" onclick="toggleFavFilter()">
-            <svg viewBox="0 0 24 24" fill="#e94560" stroke="#e94560" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            <span id="favFilterLabel">Favoris (0)</span>
+        <div style="display:flex;gap:8px;padding:0 16px 8px;flex-shrink:0">
+            <div class="fav-filter" id="favFilter" onclick="toggleFavFilter()" style="flex:1;margin:0">
+                <svg viewBox="0 0 24 24" fill="#e94560" stroke="#e94560" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <span id="favFilterLabel">Favoris (0)</span>
+            </div>
+            <div class="fav-filter" id="favClear" onclick="clearFavorites()" style="margin:0;display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span>Tout supprimer</span>
+            </div>
         </div>
         <div class="list-body" id="listBody"></div>
     </div>
@@ -1300,6 +1337,14 @@
             buildList();
         }
 
+        function clearFavorites() {
+            if (!favorites.size) return;
+            favorites.clear();
+            localStorage.setItem('favorites', '[]');
+            if (lastIndex >= 0) document.getElementById('favBtn').classList.remove('active');
+            buildList();
+        }
+
         function buildList() {
             const body = document.getElementById('listBody');
             const groups = { facile: [], moyen: [], avance: [] };
@@ -1309,6 +1354,7 @@
             });
 
             document.getElementById('favFilterLabel').textContent = `Favoris (${favorites.size})`;
+            document.getElementById('favClear').style.display = favorites.size ? 'flex' : 'none';
 
             const labels = { facile: 'Facile', moyen: 'Moyen', avance: 'Avancé' };
             let html = '';
@@ -1323,7 +1369,8 @@
                     const heart = favorites.has(p.name)
                         ? '<svg viewBox="0 0 24 24" fill="#e94560" stroke="#e94560" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
                         : '';
-                    html += `<div class="list-item" onclick="selectPosition(${p.idx})">
+                    html += `<div class="list-item" data-idx="${p.idx}" onclick="selectPosition(${p.idx})">
+                        <div class="list-item-swipe-hint"><svg viewBox="0 0 24 24" fill="#e94560" stroke="#e94560" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
                         <div class="list-item-icon">${icon}</div>
                         <div class="list-item-text">
                             <div class="list-item-name">${p.name}</div>
@@ -1376,7 +1423,45 @@
             }
         });
 
-        // Swipe support
+        // Swipe-to-fav in list
+        (function() {
+            const listBody = document.getElementById('listBody');
+            let startX = 0, startY = 0, swiping = null, moved = false;
+            listBody.addEventListener('touchstart', (e) => {
+                const item = e.target.closest('.list-item');
+                if (!item) return;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                swiping = item;
+                moved = false;
+            }, { passive: true });
+            listBody.addEventListener('touchmove', (e) => {
+                if (!swiping) return;
+                const dx = e.touches[0].clientX - startX;
+                const dy = Math.abs(e.touches[0].clientY - startY);
+                if (dy > 30) { swiping.classList.remove('swiping'); swiping = null; return; }
+                if (dx > 30) { swiping.classList.add('swiping'); moved = true; }
+                else { swiping.classList.remove('swiping'); }
+            }, { passive: true });
+            listBody.addEventListener('touchend', (e) => {
+                if (!swiping) return;
+                if (moved && swiping.classList.contains('swiping')) {
+                    const idx = parseInt(swiping.dataset.idx);
+                    const name = positions[idx].name;
+                    if (favorites.has(name)) favorites.delete(name);
+                    else favorites.add(name);
+                    localStorage.setItem('favorites', JSON.stringify([...favorites]));
+                    if (lastIndex >= 0) document.getElementById('favBtn').classList.toggle('active', favorites.has(positions[lastIndex].name));
+                    buildList();
+                    e.preventDefault();
+                }
+                if (swiping) swiping.classList.remove('swiping');
+                swiping = null;
+                moved = false;
+            }, { passive: false });
+        })();
+
+        // Swipe support (card)
         let touchStartY = 0;
         const card = document.getElementById('card');
         card.addEventListener('touchstart', (e) => {
