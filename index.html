@@ -564,6 +564,76 @@
                 margin-top: 12px;
             }
         }
+
+        /* ===== TIMER ===== */
+        .timer-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 8px 0 4px;
+        }
+
+        .timer-circle {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-ring {
+            position: absolute;
+            inset: 0;
+            transform: rotate(-90deg);
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 3;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: #e94560;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 113.1;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear, stroke 0.3s;
+        }
+
+        .timer-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-circle.done .timer-progress { stroke: #2ed573; }
+
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50%       { transform: scale(1.2); }
+        }
+
+        .timer-circle.done { animation: timerPulse 0.25s ease 3; }
+
+        /* ===== ZOOM SVG ===== */
+        #zoomSvgWrap {
+            width: min(70vw, 70vh);
+            height: min(70vw, 70vh);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.4));
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .zoom-overlay.open #zoomSvgWrap { transform: scale(1); }
+        #zoomSvgWrap svg { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
@@ -584,6 +654,15 @@
         <div class="difficulty" id="difficulty"></div>
         <div class="position-name" id="positionName"></div>
         <div class="position-desc" id="positionDesc"></div>
+        <div class="timer-wrap" id="timerWrap">
+            <div class="timer-circle" id="timerCircle">
+                <svg class="timer-ring" viewBox="0 0 44 44">
+                    <circle class="timer-bg" cx="22" cy="22" r="18"/>
+                    <circle class="timer-progress" id="timerProgress" cx="22" cy="22" r="18"/>
+                </svg>
+                <span class="timer-label" id="timerLabel"></span>
+            </div>
+        </div>
         <div class="hint" id="hint">Touche pour générer</div>
     </div>
 
@@ -593,6 +672,7 @@
 
     <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom()">
         <img id="zoomImg" src="" alt=""/>
+        <div id="zoomSvgWrap"></div>
         <span class="zoom-hint">Touche pour fermer</span>
     </div>
 
@@ -641,7 +721,7 @@
             },
             {
                 name: "Cuillère",
-                desc: "Allongés sur le côté, emboîtés l'un contre l'autre. Doux, tendre et parfait pour le matin.",
+                desc: "Elle est allongée sur lui, jambes serrées, et glisse de bas en haut. La friction est maximale grâce aux jambes jointes.",
                 difficulty: "facile",
                 img: "ic_slide.png"
             },
@@ -678,13 +758,13 @@
             },
             {
                 name: "La chaise longue",
-                desc: "Il est allongé, elle s'assied sur lui en s'inclinant en arrière, dos contre son torse.",
+                desc: "Il est assis en appui sur ses mains. Elle est sur le dos face à lui, pieds posés sur ses épaules. Pénétration profonde et directe.",
                 difficulty: "facile",
                 img: "ic_deckchair.png"
             },
             {
                 name: "La séduction",
-                desc: "Position allongée très intime, corps enlacés, visages proches. Tendresse et sensualité.",
+                desc: "Elle est sur le dos, jambes repliées sous le corps. Il s'allonge par-dessus. Contact total, pénétration intime et profonde.",
                 difficulty: "facile",
                 img: "ic_seduction.png"
             },
@@ -696,7 +776,7 @@
             },
             {
                 name: "Le tigre couché",
-                desc: "Elle est à plat ventre, lui par-dessus. Pénétration douce avec tout le poids du corps en contact.",
+                desc: "Il est assis, jambes tendues devant lui. Elle est à plat ventre et recule vers lui. Pénétration douce depuis une posture intime et originale.",
                 difficulty: "facile",
                 img: "ic_prone_tiger.png"
             },
@@ -708,7 +788,7 @@
             },
             {
                 name: "Le X",
-                desc: "Allongés en forme de X, jambes entrelacées. Mouvements lents et sensuels, contact total.",
+                desc: "Il est sur le dos avec un oreiller. Elle le chevauche en lui tournant le dos, bras autour de ses jambes. Angle intense, stimulation maximale.",
                 difficulty: "facile",
                 img: "ic_x_rated.png"
             },
@@ -726,13 +806,13 @@
             },
             {
                 name: "L'étreinte",
-                desc: "À genoux l'un contre l'autre, corps serrés. Très intime, beaucoup de peau contre peau.",
+                desc: "Debout, elle saute dans ses bras et enroule ses jambes autour de sa taille. Il la maintient. Passion intense, parfaite contre un mur.",
                 difficulty: "facile",
                 img: "ic_clasp.png"
             },
             {
                 name: "L'après-midi câlin",
-                desc: "Allongés sur le côté, détendus, en cuillère décontractée. Parfait pour un moment doux et tranquille.",
+                desc: "Il est allongé sur le côté. Elle est sur le dos, perpendiculairement à lui, genoux posés sur sa hanche. Angle doux et original.",
                 difficulty: "facile",
                 img: "ic_afternoon_delight.png"
             },
@@ -750,7 +830,7 @@
             },
             {
                 name: "La pause zen",
-                desc: "Position relaxante, allongés sans effort. On se laisse porter par le moment, sans pression.",
+                desc: "Allongés sur le côté, face à face. Elle enroule ses jambes autour de lui. Doux, lent et profondément connecté.",
                 difficulty: "facile",
                 img: "ic_zen_pause.png"
             },
@@ -800,7 +880,7 @@
             },
             {
                 name: "Le cadenas",
-                desc: "Debout, elle enroule une jambe autour de lui. Très passionné, contre un mur de préférence.",
+                desc: "Elle est assise en hauteur, penchée en arrière. Il est debout face à elle. Pénétration profonde depuis cette position surélevée.",
                 difficulty: "moyen",
                 img: "ic_padlock.png"
             },
@@ -818,13 +898,13 @@
             },
             {
                 name: "L'enclume",
-                desc: "Elle est sur le dos, jambes repliées sur sa poitrine. Il s'appuie au-dessus. Pénétration très profonde.",
+                desc: "Elle est sur le dos avec un coussin sous les fesses. Il est assis, jambes de part et d'autre d'elle. Position profonde et accessible.",
                 difficulty: "moyen",
                 img: "ic_fold.png"
             },
             {
                 name: "La cavalière",
-                desc: "Elle chevauche de façon dynamique, penchée en avant, mains sur ses épaules. Rythme soutenu.",
+                desc: "Elle le chevauche dos à lui, penchée en avant, mains sur ses genoux. Vue magnifique, elle contrôle le rythme et la profondeur.",
                 difficulty: "moyen",
                 img: "ic_rider.png"
             },
@@ -848,7 +928,7 @@
             },
             {
                 name: "Le sphinx",
-                desc: "Elle est à quatre pattes, bras tendus comme un sphinx. Il se place derrière.",
+                desc: "Elle est à plat ventre sur les coudes, une jambe légèrement écartée. Il s'allonge sur elle. Contact complet et pression enveloppante.",
                 difficulty: "moyen",
                 img: "ic_sphinx.png"
             },
@@ -860,25 +940,25 @@
             },
             {
                 name: "La balançoire",
-                desc: "Il est assis, elle sur ses genoux dos à lui, se balance d'avant en arrière.",
+                desc: "Il est assis sur une chaise, coussin sous les genoux. Elle s'installe sur lui, jambes remontées très haut. Acrobatique et extrêmement intense.",
                 difficulty: "moyen",
                 img: "ic_lap_top.png"
             },
             {
                 name: "Le visiteur",
-                desc: "Debout, il la prend par derrière en l'enlaçant. Étreinte passionnée et dominante.",
+                desc: "Debout, face à face, corps contre corps. Simple, intense, spontané. Parfait pour les moments de désir soudain.",
                 difficulty: "moyen",
                 img: "ic_visitor.png"
             },
             {
                 name: "La bandoulière",
-                desc: "Assis face à face, jambes par-dessus les siennes. Les bras se croisent pour se tenir. Très connectés.",
+                desc: "Elle est sur le dos, genoux relevés. Il est à genoux face à elle, avant-bras posés sur ses genoux. Pénétration profonde et précise.",
                 difficulty: "moyen",
                 img: "ic_bandoleer.png"
             },
             {
                 name: "Le panier",
-                desc: "Elle est assise sur lui, jambes croisées derrière son dos. Il la soutient. Fusion totale.",
+                desc: "Il est assis, une jambe tendue, l'autre repliée. Elle s'installe sur ses genoux. Position intime et enveloppante.",
                 difficulty: "moyen",
                 img: "ic_basket.png"
             },
@@ -890,7 +970,7 @@
             },
             {
                 name: "Le tigre accroupi",
-                desc: "Elle s'accroupit sur lui, pieds à plat, penchée en avant. Dynamique et contrôle total pour elle.",
+                desc: "Elle s'accroupit sur lui, pieds à plat, lui tournant le dos. Elle contrôle l'amplitude et le rythme.",
                 difficulty: "moyen",
                 img: "ic_crouching_tiger.png"
             },
@@ -902,7 +982,7 @@
             },
             {
                 name: "La galère",
-                desc: "Il est assis, elle se met à quatre pattes au-dessus de lui, dos à lui. Position originale et intense.",
+                desc: "Il est assis en appui sur un bras. Elle s'assied sur lui, penchée en avant. Position dynamique et pénétration profonde.",
                 difficulty: "moyen",
                 img: "ic_galley.png"
             },
@@ -914,7 +994,7 @@
             },
             {
                 name: "Le héros",
-                desc: "Il est à genoux, elle pose une jambe sur son épaule. Sensation d'étirement et profondeur.",
+                desc: "Elle est sur le dos, genoux ramenés vers la poitrine. Il est à genoux, ses cuisses sous elle. Pénétration profonde et contrôlée.",
                 difficulty: "moyen",
                 img: "ic_hero.png"
             },
@@ -932,19 +1012,19 @@
             },
             {
                 name: "L'accroupie",
-                desc: "Elle s'accroupit au-dessus de lui, en équilibre. Intense pour les cuisses mais sensations fortes.",
+                desc: "Elle est debout sur le lit, lui debout derrière elle, mains sur ses fesses pour guider. Position verticale intense et dominante.",
                 difficulty: "moyen",
                 img: "ic_squat_balance.png"
             },
             {
                 name: "La croix",
-                desc: "Allongés perpendiculairement, corps en croix. Pénétration latérale, mains libres pour caresser.",
+                desc: "Elle est sur le dos, une jambe tendue, l'autre levée. Il est à cheval sur sa jambe tendue. Angle asymétrique, stimulation unique.",
                 difficulty: "moyen",
                 img: "ic_cross.png"
             },
             {
                 name: "Le crapaud",
-                desc: "Elle est accroupie basse, presque assise. Il est derrière, également accroupi. Profond et compact.",
+                desc: "Elle est sur le dos, lui entre ses jambes. Il pénètre lentement et profondément. Contact direct et intimité maximale.",
                 difficulty: "moyen",
                 img: "ic_toad.png"
             },
@@ -956,19 +1036,19 @@
             },
             {
                 name: "Le navire",
-                desc: "Elle est allongée, jambes sur ses épaules. Il est à genoux. Pénétration contrôlée et profonde.",
+                desc: "Il est allongé sur le dos. Elle s'assied sur lui en amazone, jambes du même côté. Position originale aux sensations latérales.",
                 difficulty: "moyen",
                 img: "ic_ship.png"
             },
             {
                 name: "L'agrafe",
-                desc: "Allongés sur le côté, face à face, jambes entrelacées. Serrés, lents, connectés.",
+                desc: "Il est sur le dos, jambes serrées. Elle le chevauche et s'incline en arrière, en appui sur ses mains. Cambrage intense.",
                 difficulty: "moyen",
                 img: "ic_clip.png"
             },
             {
                 name: "Le chuchotement",
-                desc: "Elle est sur le dos, lui à côté, penchée vers elle. Intimitié maximale, on se parle à l'oreille.",
+                desc: "Il est allongé sur le côté. Elle enroule ses jambes autour de sa taille et croise les chevilles. Fusion douce, mouvements subtils.",
                 difficulty: "moyen",
                 img: "ic_wisper.png"
             },
@@ -980,7 +1060,7 @@
             },
             {
                 name: "Le Tominagi",
-                desc: "Position japonaise traditionnelle. Il est assis, elle sur lui face à face, rythme lent et profond.",
+                desc: "Il est à genoux. Elle est sur le dos, pieds posés sur sa poitrine. Position japonaise traditionnelle à pénétration profonde et contrôlée.",
                 difficulty: "moyen",
                 img: "ic_tominagi.png"
             },
@@ -1004,7 +1084,7 @@
             },
             {
                 name: "La Super 8",
-                desc: "Elle le chevauche en décrivant des mouvements en 8 avec ses hanches. Rythme envoûtant.",
+                desc: "Elle est sur le dos avec un coussin sous les fesses. Il est entre ses jambes, en appui sur les bras. Pénétration profonde et rythmée.",
                 difficulty: "moyen",
                 img: "ic_super_8.png"
             },
@@ -1028,7 +1108,7 @@
             },
             {
                 name: "Le glissement",
-                desc: "Elle glisse progressivement vers l'avant pendant qu'il la suit. Mouvement fluide et continu.",
+                desc: "Elle est à plat ventre sur les coudes. Il est assis entre ses jambes, face à son dos. Pénétration douce depuis cette posture originale.",
                 difficulty: "moyen",
                 img: "ic_landslide.png"
             },
@@ -1040,13 +1120,13 @@
             },
             {
                 name: "L'acolyte",
-                desc: "Elle est assise sur lui de côté, il la soutient. Position asymétrique et originale.",
+                desc: "Elle est sur le côté, dos à lui. Il est à genoux et enjambe sa jambe. Angle latéral original, stimulation asymétrique.",
                 difficulty: "moyen",
                 img: "ic_sidekick.png"
             },
             {
                 name: "Le maître des cuisses",
-                desc: "Elle serre ses cuisses autour de lui pour augmenter la friction. Intense et contrôlé.",
+                desc: "Il est sur le dos, jambes pliées et écartées. Elle s'assied à califourchon sur une de ses cuisses. Friction unique et stimulation intense.",
                 difficulty: "moyen",
                 img: "ic_thigh_master.png"
             },
@@ -1064,19 +1144,19 @@
             },
             {
                 name: "La charnière",
-                desc: "Il est à genoux, penché en arrière comme une charnière. Elle le chevauche. Étirement et profondeur.",
+                desc: "Elle est à genoux sur les coudes. Il est à genoux derrière elle, légèrement penché en arrière. Pénétration profonde et contrôlée.",
                 difficulty: "moyen",
                 img: "ic_hinge.png"
             },
             {
                 name: "La prise",
-                desc: "Elle le tient fermement avec ses jambes, il ne peut pas bouger. Elle contrôle tout.",
+                desc: "Elle est sur le dos, hanches surélevées. Il est entre ses jambes tandis qu'elle ondule le bassin de droite à gauche. Rythme envoûtant.",
                 difficulty: "moyen",
                 img: "ic_grip.png"
             },
             {
                 name: "Le slip",
-                desc: "Variante de la levrette, elle est plus basse et plus cambrée. Angle accentué.",
+                desc: "Il est à genoux, légèrement incliné en arrière. Elle est sur le dos et incline les hanches vers lui. Angle de pénétration unique.",
                 difficulty: "moyen",
                 img: "ic_slip.png"
             },
@@ -1096,7 +1176,7 @@
             },
             {
                 name: "L'hélice",
-                desc: "Elle tourne sur lui à 360° sans se déconnecter. Prouesse technique, sensations rotatives.",
+                desc: "Elle est sur le dos, jambes serrées. Il est sur elle, face à ses pieds. Angle totalement inversé pour des sensations radicalement différentes.",
                 difficulty: "avance",
                 img: "ic_propeller.png"
             },
@@ -1114,13 +1194,13 @@
             },
             {
                 name: "La roue de Catherine",
-                desc: "Assis dos à dos, jambes croisées entre eux. Rotation lente, connexion inhabituelle.",
+                desc: "Assis face à face, elle enroule ses jambes autour de sa taille. Contact visuel intense, mouvements de va-et-vient profonds.",
                 difficulty: "avance",
                 img: "ic_catherine_wheel.png"
             },
             {
                 name: "Le double pont",
-                desc: "Les deux font le pont simultanément, superposés. Extrêmement acrobatique.",
+                desc: "Il est sur le dos. Elle s'allonge sur lui dos à dos, en appui sur les coudes. Position originale et intense, corps dos à dos.",
                 difficulty: "avance",
                 img: "ic_double_decker.png"
             },
@@ -1138,7 +1218,7 @@
             },
             {
                 name: "Le bambou fendu",
-                desc: "Elle lève une jambe très haut, posée sur son épaule. L'autre reste au sol. Grand écart partiel requis.",
+                desc: "Elle est sur le dos, une jambe tendue, l'autre sur son épaule. Il est entre ses jambes. Étirement intense, pénétration profonde.",
                 difficulty: "avance",
                 img: "ic_splitting_bamboo.png"
             },
@@ -1150,19 +1230,19 @@
             },
             {
                 name: "La charrue",
-                desc: "Elle est sur le dos, jambes ramenées au-dessus de sa tête comme en yoga. Très profond et intense.",
+                desc: "Elle est au bord du lit, jambes pendantes dans le vide. Il est debout et soulève ses hanches pour la pénétrer. Profond et dynamique.",
                 difficulty: "avance",
                 img: "ic_plough.png"
             },
             {
                 name: "L'équilibriste",
-                desc: "Elle est en appui sur un pied, l'autre en l'air, il la soutient. Équilibre précaire mais excitant.",
+                desc: "Il est sur le dos, jambes ouvertes. Elle s'installe entre ses cuisses, repliée sur elle-même. Position enveloppante et intime.",
                 difficulty: "avance",
                 img: "ic_balancing_act.png"
             },
             {
                 name: "Le défi",
-                desc: "Position complexe nécessitant force et souplesse des deux partenaires. Pour les aventuriers.",
+                desc: "Elle est accroupie sur un support surélevé. Il entre par derrière en tenant sa taille. Sportif, pénétration profonde, très belle vue.",
                 difficulty: "avance",
                 img: "ic_challenge.png"
             },
@@ -1174,13 +1254,13 @@
             },
             {
                 name: "Le singe",
-                desc: "Elle s'accroche à lui comme un singe à un arbre. Il est debout, elle suspendue. Force brute requise.",
+                desc: "Il est sur le dos, genoux ramenés vers la poitrine. Elle s'assied sur lui dos à lui, ses pieds appuyés dans son dos. Profond et original.",
                 difficulty: "avance",
                 img: "ic_ape.png"
             },
             {
                 name: "L'arc de triomphe",
-                desc: "Il est debout, cambré en arrière formant un arc. Elle s'adapte dessous. Spectaculaire.",
+                desc: "Elle est sur le dos, jambes repliées sous son corps. Il est entre ses jambes, les siennes étendues. Position cambrée, pénétration profonde.",
                 difficulty: "avance",
                 img: "ic_triumph_arch.png"
             },
@@ -1192,19 +1272,19 @@
             },
             {
                 name: "La supernova",
-                desc: "Position explosive où les deux partenaires sont imbriqués de façon complexe. Coordination parfaite requise.",
+                desc: "Son buste pend hors du lit, elle est assise sur lui en appui sur ses bras. Position explosive qui requiert coordination et équilibre.",
                 difficulty: "avance",
                 img: "ic_supernova.png"
             },
             {
                 name: "La courbe en Y",
-                desc: "Les corps forment un Y. Elle lève une jambe à la verticale pendant la pénétration. Souplesse extrême.",
+                desc: "Elle est à plat ventre, corps partiellement suspendu au bord du lit. Il s'allonge entre ses jambes par derrière. Profond et intense.",
                 difficulty: "avance",
                 img: "ic_y_curve.png"
             },
             {
                 name: "La force G",
-                desc: "Position intense où la gravité joue un rôle central. Elle est presque inversée, il la maintient.",
+                desc: "Elle est sur le dos, genoux ramenés vers la poitrine. Il est à genoux et soulève son buste vers lui. Pénétration très profonde, requiert de la force.",
                 difficulty: "avance",
                 img: "ic_g_force.png"
             },
@@ -1216,7 +1296,7 @@
             },
             {
                 name: "Les ciseaux suspendus",
-                desc: "Comme les ciseaux mais avec un partenaire partiellement suspendu. Équilibre et force nécessaires.",
+                desc: "Elle est au bord du lit, pieds joints en l'air. Il est debout et enjambe sa jambe. Angle unique et pénétration originale.",
                 difficulty: "avance",
                 img: "ic_suspended_scissors.png"
             },
@@ -1240,6 +1320,55 @@
         let activeFilters = new Set(['facile', 'moyen', 'avance']);
         let favorites = new Set(JSON.parse(localStorage.getItem('favorites') || '[]'));
         let showFavOnly = false;
+
+        const TIMER_CIRC = 2 * Math.PI * 18; // 113.1
+        let timerInterval = null;
+        let timerTotal = 0;
+        let timerLeft = 0;
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerTotal = 30 + Math.floor(Math.random() * 61); // 30–90 s
+            timerLeft = timerTotal;
+            document.getElementById('timerCircle').classList.remove('done');
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timerLeft--;
+                updateTimerDisplay();
+                if (timerLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    document.getElementById('timerCircle').classList.add('done');
+                    playBeep();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timerLeft / 60);
+            const s = timerLeft % 60;
+            document.getElementById('timerLabel').textContent = m + ':' + String(s).padStart(2, '0');
+            document.getElementById('timerProgress').style.strokeDashoffset =
+                TIMER_CIRC * (1 - timerLeft / timerTotal);
+        }
+
+        function playBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [0, 0.25, 0.5].forEach(t => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime + t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.2);
+                    osc.start(ctx.currentTime + t);
+                    osc.stop(ctx.currentTime + t + 0.2);
+                });
+            } catch (e) {}
+        }
 
         function toggleFilter(el) {
             const level = el.dataset.level;
@@ -1293,16 +1422,28 @@
             const pos = filtered[index];
             lastIndex = positions.indexOf(pos);
             showPosition(pos, true);
+            startTimer();
         }
 
         function openZoom(e) {
             e.stopPropagation();
             if (lastIndex < 0) return;
             const pos = positions[lastIndex];
-            const src = pos.img ? IMG_BASE + pos.img : '';
-            if (!src) return;
-            document.getElementById('zoomImg').src = src;
-            document.getElementById('zoomImg').alt = pos.name;
+            const img = document.getElementById('zoomImg');
+            const svgWrap = document.getElementById('zoomSvgWrap');
+            if (pos.img) {
+                img.src = IMG_BASE + pos.img;
+                img.alt = pos.name;
+                img.style.display = '';
+                svgWrap.style.display = 'none';
+                svgWrap.innerHTML = '';
+            } else if (pos.svg) {
+                img.style.display = 'none';
+                svgWrap.innerHTML = pos.svg;
+                svgWrap.style.display = 'flex';
+            } else {
+                return;
+            }
             document.getElementById('zoomOverlay').classList.add('open');
         }
 
@@ -1334,6 +1475,8 @@
             favorites.clear();
             localStorage.setItem('favorites', '[]');
             if (lastIndex >= 0) document.getElementById('favBtn').classList.remove('active');
+            showFavOnly = false;
+            document.getElementById('favFilter').classList.remove('active');
             buildList();
         }
 
@@ -1383,6 +1526,7 @@
             lastIndex = idx;
             showPosition(positions[idx], true);
             closeList();
+            startTimer();
         }
 
         function openList() {
