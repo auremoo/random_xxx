@@ -155,6 +155,12 @@
             border-color: rgba(233, 69, 96, 0.5);
         }
 
+        .filter-chip.active.coquin {
+            background: rgba(192, 132, 252, 0.2);
+            color: #c084fc;
+            border-color: rgba(192, 132, 252, 0.5);
+        }
+
         .hint {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.25);
@@ -201,6 +207,12 @@
             background: rgba(233, 69, 96, 0.2);
             color: #e94560;
             border: 1px solid rgba(233, 69, 96, 0.3);
+        }
+
+        .difficulty.coquin {
+            background: rgba(192, 132, 252, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.3);
         }
 
         footer {
@@ -327,6 +339,7 @@
         .list-section-title.facile { color: #2ed573; }
         .list-section-title.moyen { color: #ffa502; }
         .list-section-title.avance { color: #e94560; }
+        .list-section-title.coquin { color: #c084fc; }
 
         .list-item {
             display: flex;
@@ -644,6 +657,7 @@
         <div class="filter-chip active facile" data-level="facile" onclick="toggleFilter(this)">Facile</div>
         <div class="filter-chip active moyen" data-level="moyen" onclick="toggleFilter(this)">Moyen</div>
         <div class="filter-chip active avance" data-level="avance" onclick="toggleFilter(this)">Avancé</div>
+        <div class="filter-chip active coquin" data-level="coquin" onclick="toggleFilter(this)">Coquin</div>
     </div>
 
     <div class="card" id="card" onclick="generate()" style="position:relative">
@@ -1305,6 +1319,138 @@
                 desc: "Contre un mur, elle est soulevée et plaquée. Requiert force et un bon mur solide.",
                 difficulty: "avance",
                 img: "ic_wall.png"
+            },
+
+            // ===== COQUIN =====
+            {
+                name: "Fellation assise",
+                desc: "Elle est agenouillée devant lui, debout ou assis. Position orale classique, elle contrôle le rythme et l'intensité.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="122" cy="28" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="122" y1="38" x2="122" y2="88" stroke="white" stroke-width="2.5"/>
+                    <line x1="122" y1="58" x2="105" y2="72" stroke="white" stroke-width="2.5"/>
+                    <line x1="122" y1="58" x2="138" y2="70" stroke="white" stroke-width="2.5"/>
+                    <line x1="122" y1="88" x2="108" y2="130" stroke="white" stroke-width="2.5"/>
+                    <line x1="122" y1="88" x2="136" y2="130" stroke="white" stroke-width="2.5"/>
+                    <circle cx="98" cy="80" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="98" y1="90" x2="78" y2="112" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="78" y1="112" x2="62" y2="148" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="78" y1="112" x2="90" y2="148" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="88" y1="96" x2="108" y2="88" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="88" y1="100" x2="110" y2="95" stroke="#e94560" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "Cunnilingus allongé",
+                desc: "Elle est allongée sur le dos, lui entre ses jambes. Position orale pour son plaisir, ses mains libres pour guider.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="22" cy="65" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="32" y1="65" x2="100" y2="65" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="58" y1="63" x2="52" y2="45" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="58" y1="67" x2="52" y2="83" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="100" y1="65" x2="130" y2="42" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="100" y1="65" x2="128" y2="88" stroke="#e94560" stroke-width="2.5"/>
+                    <circle cx="98" cy="95" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="88" y1="95" x2="40" y2="100" stroke="white" stroke-width="2.5"/>
+                    <line x1="40" y1="100" x2="15" y2="108" stroke="white" stroke-width="2.5"/>
+                    <line x1="40" y1="100" x2="18" y2="92" stroke="white" stroke-width="2.5"/>
+                    <line x1="62" y1="97" x2="58" y2="112" stroke="white" stroke-width="2.5"/>
+                    <line x1="62" y1="98" x2="58" y2="83" stroke="white" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "69 inversé",
+                desc: "Lui par-dessus, elle en dessous. Plaisir oral mutuel avec lui qui contrôle le rythme et la profondeur.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="135" cy="52" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="125" y1="52" x2="68" y2="56" stroke="white" stroke-width="2.5"/>
+                    <line x1="68" y1="56" x2="38" y2="36" stroke="white" stroke-width="2.5"/>
+                    <line x1="68" y1="56" x2="42" y2="70" stroke="white" stroke-width="2.5"/>
+                    <line x1="100" y1="53" x2="105" y2="37" stroke="white" stroke-width="2.5"/>
+                    <line x1="100" y1="55" x2="105" y2="70" stroke="white" stroke-width="2.5"/>
+                    <circle cx="25" cy="102" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="35" y1="102" x2="92" y2="98" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="92" y1="98" x2="122" y2="116" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="92" y1="98" x2="118" y2="82" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="55" y1="101" x2="50" y2="116" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="55" y1="102" x2="50" y2="88" stroke="#e94560" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "Levrette anale",
+                desc: "Elle est à quatre pattes, lui derrière. Variante anale de la levrette. Pénétration profonde, angle parfait.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="28" cy="52" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="38" y1="55" x2="100" y2="60" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="55" y1="57" x2="45" y2="90" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="62" y1="57" x2="68" y2="90" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="100" y1="60" x2="108" y2="90" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="100" y1="60" x2="118" y2="88" stroke="#e94560" stroke-width="2.5"/>
+                    <circle cx="132" cy="32" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="132" y1="42" x2="132" y2="85" stroke="white" stroke-width="2.5"/>
+                    <line x1="132" y1="62" x2="115" y2="65" stroke="white" stroke-width="2.5"/>
+                    <line x1="132" y1="85" x2="118" y2="125" stroke="white" stroke-width="2.5"/>
+                    <line x1="132" y1="85" x2="146" y2="125" stroke="white" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "Amazone anale",
+                desc: "Elle le chevauche et contrôle la pénétration anale. Elle gère l'angle et la profondeur à son propre rythme.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="22" cy="112" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="32" y1="112" x2="118" y2="110" stroke="white" stroke-width="2.5"/>
+                    <line x1="58" y1="110" x2="52" y2="92" stroke="white" stroke-width="2.5"/>
+                    <line x1="58" y1="114" x2="52" y2="130" stroke="white" stroke-width="2.5"/>
+                    <line x1="118" y1="110" x2="142" y2="98" stroke="white" stroke-width="2.5"/>
+                    <line x1="118" y1="110" x2="142" y2="122" stroke="white" stroke-width="2.5"/>
+                    <circle cx="82" cy="28" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="82" y1="38" x2="82" y2="82" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="82" y1="55" x2="62" y2="68" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="82" y1="55" x2="102" y2="68" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="82" y1="82" x2="52" y2="112" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="82" y1="82" x2="112" y2="112" stroke="#e94560" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "Cuillère anale",
+                desc: "Allongés sur le côté, lui derrière elle. La version anale de la cuillère — douce, intime, sans effort.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="28" cy="68" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="38" y1="70" x2="110" y2="72" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="62" y1="68" x2="56" y2="52" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="62" y1="70" x2="56" y2="85" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="110" y1="72" x2="140" y2="75" stroke="#e94560" stroke-width="2.5"/>
+                    <circle cx="28" cy="90" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="38" y1="92" x2="108" y2="94" stroke="white" stroke-width="2.5"/>
+                    <line x1="58" y1="90" x2="68" y2="76" stroke="white" stroke-width="2.5"/>
+                    <line x1="58" y1="92" x2="52" y2="106" stroke="white" stroke-width="2.5"/>
+                    <line x1="108" y1="94" x2="138" y2="97" stroke="white" stroke-width="2.5"/>
+                </svg>`
+            },
+            {
+                name: "Brouette anale",
+                desc: "Elle est en appui sur les mains, il la tient par les hanches. Variante anale de la brouette. Sportif et profond.",
+                difficulty: "coquin",
+                svg: `<svg viewBox="0 0 160 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="130" cy="30" r="10" stroke="white" stroke-width="2.5"/>
+                    <line x1="130" y1="40" x2="130" y2="88" stroke="white" stroke-width="2.5"/>
+                    <line x1="130" y1="62" x2="108" y2="80" stroke="white" stroke-width="2.5"/>
+                    <line x1="130" y1="66" x2="108" y2="94" stroke="white" stroke-width="2.5"/>
+                    <line x1="130" y1="88" x2="116" y2="128" stroke="white" stroke-width="2.5"/>
+                    <line x1="130" y1="88" x2="144" y2="128" stroke="white" stroke-width="2.5"/>
+                    <circle cx="52" cy="118" r="10" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="58" y1="110" x2="92" y2="82" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="65" y1="112" x2="38" y2="128" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="65" y1="115" x2="40" y2="102" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="92" y1="82" x2="108" y2="80" stroke="#e94560" stroke-width="2.5"/>
+                    <line x1="92" y1="82" x2="108" y2="94" stroke="#e94560" stroke-width="2.5"/>
+                </svg>`
             }
         ];
 
@@ -1317,7 +1463,7 @@
         });
 
         let lastIndex = -1;
-        let activeFilters = new Set(['facile', 'moyen', 'avance']);
+        let activeFilters = new Set(['facile', 'moyen', 'avance', 'coquin']);
         let favorites = new Set(JSON.parse(localStorage.getItem('favorites') || '[]'));
         let showFavOnly = false;
 
@@ -1405,7 +1551,8 @@
             name.textContent = pos.name;
             desc.textContent = pos.desc;
             diff.textContent = pos.difficulty === 'facile' ? 'Facile' :
-                              pos.difficulty === 'moyen' ? 'Moyen' : 'Avancé';
+                              pos.difficulty === 'moyen' ? 'Moyen' :
+                              pos.difficulty === 'coquin' ? 'Coquin' : 'Avancé';
             diff.className = 'difficulty ' + pos.difficulty;
             document.getElementById('favBtn').classList.toggle('active', favorites.has(pos.name));
         }
@@ -1482,7 +1629,7 @@
 
         function buildList() {
             const body = document.getElementById('listBody');
-            const groups = { facile: [], moyen: [], avance: [] };
+            const groups = { facile: [], moyen: [], avance: [], coquin: [] };
             positions.forEach((p, i) => {
                 if (showFavOnly && !favorites.has(p.name)) return;
                 groups[p.difficulty].push({ ...p, idx: i });
@@ -1491,7 +1638,7 @@
             document.getElementById('favFilterLabel').textContent = `Favoris (${favorites.size})`;
             document.getElementById('favClear').style.display = favorites.size ? 'flex' : 'none';
 
-            const labels = { facile: 'Facile', moyen: 'Moyen', avance: 'Avancé' };
+            const labels = { facile: 'Facile', moyen: 'Moyen', avance: 'Avancé', coquin: 'Coquin' };
             let html = '';
             for (const [level, items] of Object.entries(groups)) {
                 if (!items.length) continue;
