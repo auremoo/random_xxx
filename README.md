@@ -1,3 +1,6 @@
+> Créé par **Aurélien Moote - Moo - 2026**. Logiciel libre (licence MIT) :
+> réutilisable à condition de conserver la mention de l'auteur.
+
 # Random Position Generator
 
 Générateur aléatoire de positions pour couples. Simple, fun, sans prise de tête.
@@ -13,3 +16,8 @@ Ouvrir `index.html` dans un navigateur. C'est tout.
 ## Tech
 
 Zero dépendance. Un seul fichier HTML avec CSS et JS embarqués.
+
+## Auteur & licence
+
+**Aurélien Moote - Moo - 2026** — Licence MIT
+Réutilisable librement à condition de conserver la mention de l'auteur.
