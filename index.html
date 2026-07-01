@@ -648,6 +648,127 @@
 
         .zoom-overlay.open #zoomSvgWrap { transform: scale(1); }
         #zoomSvgWrap svg { width: 100%; height: 100%; }
+
+        /* ===== Settings / DataSafe ===== */
+        .settings-btn {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: background 0.2s, color 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .settings-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .settings-overlay.open { display: flex; }
+
+        .settings-modal {
+            background: #16213e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 28px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+        }
+        .settings-modal h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .settings-subtitle {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 20px;
+        }
+        .settings-field { margin-bottom: 14px; }
+        .settings-field label {
+            display: block;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 5px;
+        }
+        .settings-field input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .settings-field input:focus { border-color: rgba(233,69,96,0.55); }
+        .settings-field input::placeholder { color: rgba(255,255,255,0.22); }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .settings-actions button {
+            flex: 1;
+            padding: 11px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            font-family: inherit;
+        }
+        .settings-actions button:active { opacity: 0.75; }
+        .btn-cancel { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.65); }
+        .btn-save { background: linear-gradient(90deg,#e94560,#ff6b6b); color: #fff; }
+        .btn-export {
+            background: rgba(233,69,96,0.1);
+            border: 1px solid rgba(233,69,96,0.35) !important;
+            color: #e94560;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(14px);
+            background: rgba(22,33,62,0.97);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 12px;
+            padding: 11px 20px;
+            color: #fff;
+            font-size: 0.84rem;
+            z-index: 400;
+            opacity: 0;
+            transition: opacity 0.28s, transform 0.28s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(80,200,120,0.45); }
+        .toast.error   { border-color: rgba(233,69,96,0.5); }
     </style>
 </head>
 <body>
@@ -690,6 +811,38 @@
         <div id="zoomSvgWrap"></div>
         <span class="zoom-hint">Touche pour fermer</span>
     </div>
+
+    <button class="settings-btn" onclick="openSettings()" title="Paramètres / Sauvegarde">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+
+    <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsBg(event)">
+        <div class="settings-modal">
+            <h3>Paramètres</h3>
+            <p class="settings-subtitle">Sauvegarde DataSafe — optionnel</p>
+            <div class="settings-field">
+                <label>URL DataSafe</label>
+                <input type="url" id="dsUrl" placeholder="https://…/api/data-safe/ingest"/>
+            </div>
+            <div class="settings-field">
+                <label>Clé API</label>
+                <input type="password" id="dsKey" placeholder="Depuis DataSafe > Paramètres"/>
+            </div>
+            <div class="settings-field">
+                <label>Nom de l'app</label>
+                <input type="text" id="dsApp" placeholder="ex: position-generator"/>
+            </div>
+            <div class="settings-actions">
+                <button class="btn-cancel" onclick="closeSettings()">Annuler</button>
+                <button class="btn-save" onclick="saveSettings()">Enregistrer</button>
+            </div>
+            <div class="settings-actions" style="margin-top:8px">
+                <button class="btn-export" onclick="exportData()">⬇ Sauvegarder / Exporter</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <div class="list-overlay" id="listOverlay" onclick="closeList()"></div>
     <div class="list-panel" id="listPanel">
@@ -1700,7 +1853,7 @@
 
         // Raccourci clavier (Espace)
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape') return closeZoom();
+            if (e.code === 'Escape') { closeZoom(); closeSettings(); return; }
             if (e.code === 'Space') {
                 e.preventDefault();
                 generate();
@@ -1715,6 +1868,99 @@
             localStorage.setItem('favorites', JSON.stringify([...favorites]));
             if (lastIndex >= 0) document.getElementById('favBtn').classList.toggle('active', favorites.has(positions[lastIndex].name));
             buildList();
+        }
+
+        // ===== Settings & DataSafe =====
+
+        function openSettings() {
+            document.getElementById('dsUrl').value = localStorage.getItem('ds_url') || '';
+            document.getElementById('dsKey').value = localStorage.getItem('ds_key') || '';
+            document.getElementById('dsApp').value = localStorage.getItem('ds_app') || '';
+            document.getElementById('settingsOverlay').classList.add('open');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsOverlay').classList.remove('open');
+        }
+
+        function closeSettingsBg(e) {
+            if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('ds_url', document.getElementById('dsUrl').value.trim());
+            localStorage.setItem('ds_key', document.getElementById('dsKey').value.trim());
+            localStorage.setItem('ds_app', document.getElementById('dsApp').value.trim());
+            closeSettings();
+            showToast('Paramètres enregistrés', 'success');
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast' + (type ? ' ' + type : '');
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function downloadJson(data) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'position-generator-' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportData() {
+            const dsUrl = localStorage.getItem('ds_url') || '';
+            const dsKey  = localStorage.getItem('ds_key') || '';
+            const dsApp  = localStorage.getItem('ds_app') || '';
+
+            // Collect all localStorage keys
+            const lsData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                try { lsData[k] = JSON.parse(localStorage.getItem(k)); }
+                catch { lsData[k] = localStorage.getItem(k); }
+            }
+
+            const payload = {
+                _meta: {
+                    exportedAt: new Date().toISOString(),
+                    storage: ['localStorage']
+                },
+                ...lsData
+            };
+
+            const configured = dsUrl && dsKey && dsApp;
+            if (configured) {
+                payload._datasafe = { apiKey: dsKey, url: dsUrl, appName: dsApp };
+                try {
+                    const res = await fetch(dsUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + dsKey,
+                            'X-App-Name': dsApp
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        const json = await res.json();
+                        showToast('✓ Sauvegardé (v' + (json.versions ?? '?') + ')', 'success');
+                        return;
+                    }
+                } catch (_) {}
+                // Réseau KO → fallback téléchargement
+                downloadJson(payload);
+                showToast('Réseau indisponible — fichier téléchargé', 'error');
+            } else {
+                downloadJson(payload);
+                showToast('Export téléchargé', 'success');
+            }
         }
 
         // Swipe support (card)
